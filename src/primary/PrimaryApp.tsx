@@ -10,6 +10,7 @@ import { formatClock, useNow } from '../useNow';
 import { ControlPanel } from './ControlPanel';
 import { CueList } from './CueList';
 import { PageList } from './PageList';
+import { useOtherPrimaryTabs } from './useOtherPrimaryTabs';
 
 function isTyping(target: EventTarget | null) {
   return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
@@ -27,6 +28,7 @@ export function PrimaryApp() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fullscreen = useIsFullscreen();
+  const otherTabs = useOtherPrimaryTabs();
   const page = currentPage(state);
 
   const outputState: OutputState = useMemo(
@@ -145,6 +147,7 @@ export function PrimaryApp() {
           </button>
         </div>
       </nav>
+      {otherTabs > 0 && <div className="warning-bar">{t('otherTabOpen')}</div>}
       {error && (
         <div className="error-bar" onClick={() => setError(null)}>
           {error}

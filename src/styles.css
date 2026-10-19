@@ -172,6 +172,12 @@ input[type='checkbox'] {
   cursor: pointer;
 }
 
+.warning-bar {
+  background: #3a2a06;
+  color: #fde68a;
+  padding: 6px 14px;
+}
+
 .workspace {
   flex: 1;
   display: grid;

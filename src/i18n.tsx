@@ -12,6 +12,8 @@ const en = {
   openOutput: 'Open Output',
   confirmNew: 'Create a new show? Unsaved changes will be lost.',
   invalidShowFile: 'This is not a Prompter show file.',
+  otherTabOpen:
+    'Prompter is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
   shortcuts:
     'Space: GO   ↑↓: Select cue   ←→: Switch page   Esc: Clear   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
 
@@ -75,6 +77,7 @@ const ja: Record<Key, string> = {
   openOutput: '出力ウィンドウを開く',
   confirmNew: '新規ショーを作成します。保存していない変更は失われます。',
   invalidShowFile: 'Prompter のショーファイルではありません。',
+  otherTabOpen: '他のタブでも Prompter が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
   shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Esc: クリア　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
 
   pages: 'ページ',

@@ -8,10 +8,12 @@ import type { OutputSettings, OutputState } from '../types';
 interface Props {
   state: AppState;
   outputState: OutputState;
+  /** ショーモード。出力の設定を変えられないようにする */
+  locked: boolean;
   dispatch: Dispatch<Action>;
 }
 
-export function ControlPanel({ state, outputState, dispatch }: Props) {
+export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
   const { t } = useLang();
   const settings = state.show.output;
   const set = (patch: Partial<OutputSettings>) => dispatch({ type: 'setOutput', patch });
@@ -53,51 +55,54 @@ export function ControlPanel({ state, outputState, dispatch }: Props) {
           </button>
         </div>
 
-        <Section title={t('colors')}>
-          <ColorField label={t('background')} value={settings.background} onChange={(v) => set({ background: v })} />
-          <ColorField label={t('textColor')} value={settings.textColor} onChange={(v) => set({ textColor: v })} />
-          <ColorField
-            label={t('outline')}
-            value={settings.outlineColor}
-            onChange={(v) => set({ outlineColor: v })}
-            enabled={settings.outlineEnabled}
-            onToggle={(v) => set({ outlineEnabled: v })}
-          />
-        </Section>
-
-        <Section title={t('typography')}>
-          <Slider
-            label={t('cueSize')}
-            title={t('cueSizeHint')}
-            min={5}
-            max={40}
-            step={0.5}
-            value={nextCue?.fontSize}
-            onChange={(v) => nextCue && dispatch({ type: 'updateCue', id: nextCue.id, patch: { fontSize: v } })}
-          />
-          <Slider label={t('outlineWidth')} min={0} max={20} step={0.5} value={settings.outlineWidth} onChange={(v) => set({ outlineWidth: v })} />
-        </Section>
-
-        <Section title={t('transition')}>
-          <div className="segmented">
-            {(['dissolve', 'cut'] as const).map((tr) => (
-              <button key={tr} className={settings.transition === tr ? 'active' : ''} onClick={() => set({ transition: tr })}>
-                {t(tr)}
-              </button>
-            ))}
-          </div>
-          {settings.transition === 'dissolve' && (
-            <Slider
-              label={t('time')}
-              min={100}
-              max={3000}
-              step={50}
-              value={settings.transitionMs}
-              unit="ms"
-              onChange={(v) => set({ transitionMs: v })}
+        {/* disabled な fieldset は中のボタン・スライダーをまとめて無効にする */}
+        <fieldset className="settings" disabled={locked}>
+          <Section title={t('colors')}>
+            <ColorField label={t('background')} value={settings.background} onChange={(v) => set({ background: v })} />
+            <ColorField label={t('textColor')} value={settings.textColor} onChange={(v) => set({ textColor: v })} />
+            <ColorField
+              label={t('outline')}
+              value={settings.outlineColor}
+              onChange={(v) => set({ outlineColor: v })}
+              enabled={settings.outlineEnabled}
+              onToggle={(v) => set({ outlineEnabled: v })}
             />
-          )}
-        </Section>
+          </Section>
+
+          <Section title={t('typography')}>
+            <Slider
+              label={t('cueSize')}
+              title={t('cueSizeHint')}
+              min={5}
+              max={40}
+              step={0.5}
+              value={nextCue?.fontSize}
+              onChange={(v) => nextCue && dispatch({ type: 'updateCue', id: nextCue.id, patch: { fontSize: v } })}
+            />
+            <Slider label={t('outlineWidth')} min={0} max={20} step={0.5} value={settings.outlineWidth} onChange={(v) => set({ outlineWidth: v })} />
+          </Section>
+
+          <Section title={t('transition')}>
+            <div className="segmented">
+              {(['dissolve', 'cut'] as const).map((tr) => (
+                <button key={tr} className={settings.transition === tr ? 'active' : ''} onClick={() => set({ transition: tr })}>
+                  {t(tr)}
+                </button>
+              ))}
+            </div>
+            {settings.transition === 'dissolve' && (
+              <Slider
+                label={t('time')}
+                min={100}
+                max={3000}
+                step={50}
+                value={settings.transitionMs}
+                unit="ms"
+                onChange={(v) => set({ transitionMs: v })}
+              />
+            )}
+          </Section>
+        </fieldset>
       </div>
     </aside>
   );

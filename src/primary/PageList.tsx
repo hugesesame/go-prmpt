@@ -6,10 +6,12 @@ import type { Page } from '../types';
 interface Props {
   pages: Page[];
   currentPageId: string;
+  /** ショーモード。ページの選択だけできる */
+  locked: boolean;
   dispatch: Dispatch<Action>;
 }
 
-export function PageList({ pages, currentPageId, dispatch }: Props) {
+export function PageList({ pages, currentPageId, locked, dispatch }: Props) {
   const { t } = useLang();
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
@@ -23,7 +25,9 @@ export function PageList({ pages, currentPageId, dispatch }: Props) {
     <aside className="panel pages">
       <div className="panel-header">
         <span>{t('pages')}</span>
-        <button className="small" onClick={() => dispatch({ type: 'addPage' })}>{t('addPage')}</button>
+        {!locked && (
+          <button className="small" onClick={() => dispatch({ type: 'addPage' })}>{t('addPage')}</button>
+        )}
       </div>
       <ol className="page-list">
         {pages.map((page, i) => {
@@ -38,7 +42,7 @@ export function PageList({ pages, currentPageId, dispatch }: Props) {
               ]
                 .filter(Boolean)
                 .join(' ')}
-              draggable
+              draggable={!locked}
               onClick={() => dispatch({ type: 'selectPage', id: page.id })}
               onDragStart={() => setDragFrom(i)}
               onDragOver={(e) => {
@@ -68,7 +72,7 @@ export function PageList({ pages, currentPageId, dispatch }: Props) {
                   {page.afterLast.kind === 'next' ? '→' : `↪${pages.indexOf(target) + 1}`}
                 </span>
               )}
-              {pages.length > 1 && (
+              {!locked && pages.length > 1 && (
                 <button
                   className="icon-button"
                   aria-label={t('deletePage')}

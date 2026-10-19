@@ -16,6 +16,16 @@ function isTyping(target: EventTarget | null) {
   return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 }
 
+type Mode = 'program' | 'show';
+const MODE_KEY = 'prompter.mode';
+
+/** プログラムモード（編集）とショーモード（本番。編集をロック）。リロードしても前回のモードで開く */
+function useMode() {
+  const [mode, setMode] = useState<Mode>(() => (localStorage.getItem(MODE_KEY) === 'show' ? 'show' : 'program'));
+  useEffect(() => localStorage.setItem(MODE_KEY, mode), [mode]);
+  return [mode, setMode] as const;
+}
+
 /** ダブルクリックが独自の意味を持つ要素（文字選択・Cue 実行・ボタン連打）ではフルスクリーンにしない */
 function onBackgroundDoubleClick(e: MouseEvent) {
   if ((e.target as HTMLElement).closest('input, textarea, select, button, .cue-row, .page-item')) return;
@@ -29,6 +39,8 @@ export function PrimaryApp() {
   const [error, setError] = useState<string | null>(null);
   const fullscreen = useIsFullscreen();
   const otherTabs = useOtherPrimaryTabs();
+  const [mode, setMode] = useMode();
+  const locked = mode === 'show';
   const page = currentPage(state);
 
   const outputState: OutputState = useMemo(
@@ -76,8 +88,8 @@ export function PrimaryApp() {
     dispatch({ type: 'loadShow', show: newShow() });
   };
 
-  const keyHandlers = useRef({ save, open });
-  keyHandlers.current = { save, open };
+  const keyHandlers = useRef({ save, open, locked });
+  keyHandlers.current = { save, open, locked };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey && e.key.toLowerCase() === 's') {
@@ -87,7 +99,7 @@ export function PrimaryApp() {
       }
       if (e.metaKey && e.key.toLowerCase() === 'o') {
         e.preventDefault();
-        keyHandlers.current.open();
+        if (!keyHandlers.current.locked) keyHandlers.current.open();
         return;
       }
       if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -111,12 +123,13 @@ export function PrimaryApp() {
   }, [dispatch]);
 
   return (
-    <div className="app" onDoubleClick={onBackgroundDoubleClick}>
+    <div className={locked ? 'app show-mode' : 'app'} onDoubleClick={onBackgroundDoubleClick}>
       <header className="topbar">
         <div className="brand">PROMPTER</div>
         <input
           className="show-name"
           value={state.show.name}
+          readOnly={locked}
           onChange={(e) => dispatch({ type: 'renameShow', name: e.target.value })}
           aria-label={t('showName')}
         />
@@ -125,18 +138,14 @@ export function PrimaryApp() {
       </header>
       <nav className="toolbar">
         <div className="toolbar-group">
-          <button onClick={createNew}>{t('new')}</button>
-          <button onClick={open} title="⌘O">{t('open')}</button>
+          <button onClick={createNew} disabled={locked}>{t('new')}</button>
+          <button onClick={open} disabled={locked} title="⌘O">{t('open')}</button>
           <button onClick={() => save(false)} title="⌘S">{t('save')}</button>
           <button onClick={() => save(true)} title="⇧⌘S">{t('saveAs')}</button>
         </div>
         <div className="toolbar-group">
-          <button className="primary" onClick={openOutputWindow}>{t('openOutput')}</button>
-          <button onClick={toggleFullscreen} title={t('doubleClickFullscreen')}>
-            {fullscreen ? t('exitFullscreen') : t('fullscreen')}
-          </button>
           <button
-            className="lang-toggle"
+            className="pill-toggle"
             role="switch"
             aria-checked={lang === 'ja'}
             aria-label="ENG / JPN"
@@ -144,6 +153,21 @@ export function PrimaryApp() {
           >
             <span className={lang === 'en' ? 'active' : ''}>ENG</span>
             <span className={lang === 'ja' ? 'active' : ''}>JPN</span>
+          </button>
+          <button
+            className="pill-toggle mode-toggle"
+            role="switch"
+            aria-checked={locked}
+            aria-label="PROGRAM / SHOW"
+            title={t('modeHint')}
+            onClick={() => setMode(locked ? 'program' : 'show')}
+          >
+            <span className={locked ? '' : 'active'}>PROGRAM</span>
+            <span className={locked ? 'active' : ''}>SHOW</span>
+          </button>
+          <button className="primary" onClick={openOutputWindow}>{t('openOutput')}</button>
+          <button onClick={toggleFullscreen} title={t('doubleClickFullscreen')}>
+            {fullscreen ? t('exitFullscreen') : t('fullscreen')}
           </button>
         </div>
       </nav>
@@ -154,15 +178,16 @@ export function PrimaryApp() {
         </div>
       )}
       <main className="workspace">
-        <PageList pages={state.show.pages} currentPageId={state.currentPageId} dispatch={dispatch} />
+        <PageList pages={state.show.pages} currentPageId={state.currentPageId} locked={locked} dispatch={dispatch} />
         <CueList
           page={page}
           pages={state.show.pages}
           selectedCueId={state.selectedCueId}
           liveCueId={state.live?.cueId ?? null}
+          locked={locked}
           dispatch={dispatch}
         />
-        <ControlPanel state={state} outputState={outputState} dispatch={dispatch} />
+        <ControlPanel state={state} outputState={outputState} locked={locked} dispatch={dispatch} />
       </main>
       <footer className="statusbar">{t('shortcuts')}</footer>
     </div>

@@ -9,6 +9,8 @@ interface Props {
   pages: Page[];
   selectedCueId: string | null;
   liveCueId: string | null;
+  /** ショーモード。Cue の選択だけできる */
+  locked: boolean;
   dispatch: Dispatch<Action>;
 }
 
@@ -19,7 +21,7 @@ function decodeAfterLast(value: string): AfterLast {
   return value === 'next' ? { kind: 'next' } : { kind: 'stop' };
 }
 
-export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Props) {
+export function CueList({ page, pages, selectedCueId, liveCueId, locked, dispatch }: Props) {
   const { t } = useLang();
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
@@ -39,7 +41,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
     setEditOnSelect(false);
   }, [selectedCueId, editOnSelect]);
 
-  useEffect(() => setEditingId(null), [page.id]);
+  useEffect(() => setEditingId(null), [page.id, locked]);
 
   const addCue = () => {
     setEditOnSelect(true);
@@ -52,6 +54,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
         <input
           className="page-title"
           value={page.name}
+          readOnly={locked}
           onChange={(e) => dispatch({ type: 'renamePage', id: page.id, name: e.target.value })}
           aria-label={t('pageName')}
         />
@@ -59,6 +62,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
           {t('afterLastCue')}
           <select
             value={encodeAfterLast(page.afterLast)}
+            disabled={locked}
             onChange={(e) => dispatch({ type: 'setPageAfterLast', id: page.id, value: decodeAfterLast(e.target.value) })}
           >
             <option value="stop">{t('stop')}</option>
@@ -72,7 +76,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
             </optgroup>
           </select>
         </label>
-        <button className="small" onClick={addCue}>{t('addCue')}</button>
+        {!locked && <button className="small" onClick={addCue}>{t('addCue')}</button>}
       </div>
 
       <div className="cue-head">
@@ -101,7 +105,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
               .join(' ')}
             onClick={() => dispatch({ type: 'selectCue', id: cue.id })}
             onDoubleClick={(e) => {
-              if (!(e.target as HTMLElement).closest('textarea, input, button')) setEditingId(cue.id);
+              if (!locked && !(e.target as HTMLElement).closest('textarea, input, button')) setEditingId(cue.id);
             }}
             onDragOver={(e) => {
               e.preventDefault();
@@ -113,8 +117,8 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
           >
             <span
               className="drag-handle"
-              draggable
-              title={t('dragToReorder')}
+              draggable={!locked}
+              title={locked ? undefined : t('dragToReorder')}
               onDragStart={(e) => {
                 setDragFrom(i);
                 e.dataTransfer.setDragImage(e.currentTarget.parentElement!, 0, 0);
@@ -138,7 +142,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
                 }}
               />
             ) : (
-              <div className="cue-text-display" title={t('doubleClickToEdit')}>
+              <div className="cue-text-display" title={locked ? undefined : t('doubleClickToEdit')}>
                 {cue.text ? (
                   cue.text.split('\n').map((line, n) => (
                     <Fragment key={n}>
@@ -177,22 +181,27 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
                 <button
                   key={label}
                   className={cue.fontSize === size ? 'active' : ''}
+                  disabled={locked}
                   onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { fontSize: size } })}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            <button
-              className="icon-button"
-              aria-label={t('deleteCue')}
-              onClick={(e) => {
-                e.stopPropagation();
-                dispatch({ type: 'deleteCue', id: cue.id });
-              }}
-            >
-              ×
-            </button>
+            {locked ? (
+              <span />
+            ) : (
+              <button
+                className="icon-button"
+                aria-label={t('deleteCue')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: 'deleteCue', id: cue.id });
+                }}
+              >
+                ×
+              </button>
+            )}
           </div>
         ))}
       </div>

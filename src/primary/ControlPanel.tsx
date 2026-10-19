@@ -29,32 +29,6 @@ export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
           <OutputView state={outputState} />
         </div>
 
-        <div className="next-cue">
-          <span className="label">{t('next')}</span>
-          <span className="next-text">{nextCue ? nextCue.text || t('emptyText') : '—'}</span>
-        </div>
-
-        <button className="go-button" disabled={!nextCue} onClick={() => dispatch({ type: 'go' })}>
-          GO <small>Space</small>
-        </button>
-        <div className="transport">
-          <button onClick={() => dispatch({ type: 'clear' })}>
-            CLEAR <small>Esc</small>
-          </button>
-          <button
-            className={state.blackout ? 'toggle-button blackout active' : 'toggle-button blackout'}
-            onClick={() => dispatch({ type: 'toggleBlackout' })}
-          >
-            BLACK OUT <small>X</small>
-          </button>
-          <button
-            className={state.blink ? 'toggle-button blink active' : 'toggle-button blink'}
-            onClick={() => dispatch({ type: 'toggleBlink' })}
-          >
-            BLINK <small>B</small>
-          </button>
-        </div>
-
         {/* disabled な fieldset は中のボタン・スライダーをまとめて無効にする */}
         <fieldset className="settings" disabled={locked}>
           <Section title={t('colors')}>

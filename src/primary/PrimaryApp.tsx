@@ -12,6 +12,7 @@ import { ControlPanel } from './ControlPanel';
 import { CueList } from './CueList';
 import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
+import { Transport } from './Transport';
 import { useOtherPrimaryTabs } from './useOtherPrimaryTabs';
 import { useTimeTriggers } from './useTimeTriggers';
 
@@ -192,7 +193,10 @@ export function PrimaryApp() {
         </div>
       )}
       <main className="workspace">
-        <PageList pages={state.show.pages} currentPageId={state.currentPageId} locked={locked} dispatch={dispatch} />
+        <div className="side">
+          <Transport state={state} dispatch={dispatch} />
+          <PageList pages={state.show.pages} currentPageId={state.currentPageId} locked={locked} dispatch={dispatch} />
+        </div>
         <VerticalSplit
           storageKey="prompter.overlayHeight"
           defaultBottom={190}

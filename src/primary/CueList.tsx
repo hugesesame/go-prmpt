@@ -1,0 +1,237 @@
+import { Fragment, useEffect, useRef, useState, type Dispatch } from 'react';
+import { fontSizePresets } from '../defaults';
+import { useLang } from '../i18n';
+import type { Action } from '../state';
+import type { AfterLast, Page } from '../types';
+
+interface Props {
+  page: Page;
+  pages: Page[];
+  selectedCueId: string | null;
+  liveCueId: string | null;
+  dispatch: Dispatch<Action>;
+}
+
+const encodeAfterLast = (a: AfterLast) => (a.kind === 'page' ? `page:${a.pageId}` : a.kind);
+
+function decodeAfterLast(value: string): AfterLast {
+  if (value.startsWith('page:')) return { kind: 'page', pageId: value.slice(5) };
+  return value === 'next' ? { kind: 'next' } : { kind: 'stop' };
+}
+
+export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Props) {
+  const { t } = useLang();
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const [dropAt, setDropAt] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editOnSelect, setEditOnSelect] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // ↑↓ で選択が動いたら見える位置までスクロール
+  useEffect(() => {
+    listRef.current?.querySelector('.cue-row.selected')?.scrollIntoView({ block: 'nearest' });
+  }, [selectedCueId]);
+
+  // 「＋ Cue」で追加された Cue（追加後に選択される）をそのまま編集状態にする
+  useEffect(() => {
+    if (!editOnSelect) return;
+    setEditingId(selectedCueId);
+    setEditOnSelect(false);
+  }, [selectedCueId, editOnSelect]);
+
+  useEffect(() => setEditingId(null), [page.id]);
+
+  const addCue = () => {
+    setEditOnSelect(true);
+    dispatch({ type: 'addCue' });
+  };
+
+  return (
+    <section className="panel cues">
+      <div className="panel-header">
+        <input
+          className="page-title"
+          value={page.name}
+          onChange={(e) => dispatch({ type: 'renamePage', id: page.id, name: e.target.value })}
+          aria-label={t('pageName')}
+        />
+        <label className="toggle">
+          {t('afterLastCue')}
+          <select
+            value={encodeAfterLast(page.afterLast)}
+            onChange={(e) => dispatch({ type: 'setPageAfterLast', id: page.id, value: decodeAfterLast(e.target.value) })}
+          >
+            <option value="stop">{t('stop')}</option>
+            <option value="next">{t('nextPage')}</option>
+            <optgroup label={t('jumpToPage')}>
+              {pages.map((p, i) => (
+                <option key={p.id} value={`page:${p.id}`}>
+                  {i + 1}. {p.name || t('untitled')}
+                </option>
+              ))}
+            </optgroup>
+          </select>
+        </label>
+        <button className="small" onClick={addCue}>{t('addCue')}</button>
+      </div>
+
+      <div className="cue-head">
+        <span />
+        <span>#</span>
+        <span>{t('text')}</span>
+        <span>{t('size')}</span>
+        <span>{t('duration')}</span>
+        <span title={t('countdownHint')}>CD</span>
+        <span />
+      </div>
+      <div className="cue-list" ref={listRef}>
+        {page.cues.length === 0 && <div className="empty">{t('noCues')}</div>}
+        {page.cues.map((cue, i) => (
+          <div
+            key={cue.id}
+            className={[
+              'cue-row',
+              cue.id === selectedCueId && 'selected',
+              cue.id === liveCueId && 'live',
+              dropAt === i && dragFrom !== i && 'drop-target',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={() => dispatch({ type: 'selectCue', id: cue.id })}
+            onDoubleClick={(e) => {
+              if (!(e.target as HTMLElement).closest('textarea, input, button')) setEditingId(cue.id);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDropAt(i);
+            }}
+            onDrop={() => {
+              if (dragFrom !== null && dragFrom !== i) dispatch({ type: 'moveCue', from: dragFrom, to: i });
+            }}
+          >
+            <span
+              className="drag-handle"
+              draggable
+              title={t('dragToReorder')}
+              onDragStart={(e) => {
+                setDragFrom(i);
+                e.dataTransfer.setDragImage(e.currentTarget.parentElement!, 0, 0);
+              }}
+              onDragEnd={() => {
+                setDragFrom(null);
+                setDropAt(null);
+              }}
+            >
+              ⋮⋮
+            </span>
+            <span className="cue-number">{i + 1}</span>
+            {editingId === cue.id ? (
+              <CueTextEditor
+                initial={cue.text}
+                placeholder={t('emptyText')}
+                hint={t('textHint')}
+                onDone={(text) => {
+                  if (text !== null && text !== cue.text) dispatch({ type: 'updateCue', id: cue.id, patch: { text } });
+                  setEditingId(null);
+                }}
+              />
+            ) : (
+              <div className="cue-text-display" title={t('doubleClickToEdit')}>
+                {cue.text ? (
+                  cue.text.split('\n').map((line, n) => (
+                    <Fragment key={n}>
+                      {n > 0 && <span className="newline-mark"> ↵ </span>}
+                      {line}
+                    </Fragment>
+                  ))
+                ) : (
+                  <span className="placeholder">{t('emptyText')}</span>
+                )}
+              </div>
+            )}
+            <div className="size-presets" title={t('cueSizeHint')}>
+              {Object.entries(fontSizePresets).map(([label, size]) => (
+                <button
+                  key={label}
+                  className={cue.fontSize === size ? 'active' : ''}
+                  onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { fontSize: size } })}
+                >
+                  {label}
+                </button>
+              ))}
+              <span className="size-value">{cue.fontSize}</span>
+            </div>
+            <input
+              className="cue-duration"
+              type="number"
+              min={0}
+              step={1}
+              value={cue.duration}
+              title={t('durationHint')}
+              onFocus={() => dispatch({ type: 'selectCue', id: cue.id })}
+              onChange={(e) =>
+                dispatch({ type: 'updateCue', id: cue.id, patch: { duration: Math.max(0, Number(e.target.value) || 0) } })
+              }
+            />
+            <input
+              type="checkbox"
+              checked={cue.countdown}
+              aria-label={t('countdownHint')}
+              title={t('countdownHint')}
+              onChange={(e) => dispatch({ type: 'updateCue', id: cue.id, patch: { countdown: e.target.checked } })}
+            />
+            <button
+              className="icon-button"
+              aria-label={t('deleteCue')}
+              onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: 'deleteCue', id: cue.id });
+              }}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+interface EditorProps {
+  initial: string;
+  placeholder: string;
+  hint: string;
+  /** 確定したテキスト。取り消しは null */
+  onDone: (text: string | null) => void;
+}
+
+function CueTextEditor({ initial, placeholder, hint, onDone }: EditorProps) {
+  const [value, setValue] = useState(initial);
+  const cancelled = useRef(false);
+
+  return (
+    <textarea
+      className="cue-text"
+      rows={1}
+      autoFocus
+      value={value}
+      placeholder={placeholder}
+      title={hint}
+      onFocus={(e) => e.currentTarget.setSelectionRange(value.length, value.length)}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={() => onDone(cancelled.current ? null : value)}
+      onKeyDown={(e) => {
+        if (e.nativeEvent.isComposing) return;
+        // Enter で確定、Shift+Enter で改行、Esc で取り消し
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          e.currentTarget.blur();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelled.current = true;
+          e.currentTarget.blur();
+        }
+      }}
+    />
+  );
+}

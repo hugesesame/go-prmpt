@@ -340,7 +340,7 @@ input[type='checkbox'] {
 .cue-row {
   display: grid;
   /* 保留中の Sec / CD 列を戻すときは 1fr の後に 64px 32px を足す */
-  grid-template-columns: 22px 34px 1fr 84px 28px;
+  grid-template-columns: 22px 34px 1fr 76px 34px 92px 28px;
   gap: 6px;
   align-items: center;
   padding: 0 12px;
@@ -432,9 +432,10 @@ input[type='checkbox'] {
   color: var(--accent);
   opacity: 0.8;
 }
-/* S / M / L のボタン群（列幅とほぼ同じ幅）の中央に合わせる */
+/* S / M / L のボタン群は右寄せで、左の 8px は ON/OFF ボタンとの間隔。見出しはボタン群の中央に合わせる */
 .size-head {
   text-align: center;
+  padding-left: 8px;
 }
 .size-presets {
   justify-content: flex-end;
@@ -455,6 +456,27 @@ input[type='checkbox'] {
   background: var(--accent);
   border-color: var(--accent);
   color: #06121f;
+}
+
+.cue-time {
+  width: 100%;
+  font-family: var(--mono);
+  text-align: center;
+}
+.cue-time.off {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.time-head {
+  text-align: center;
+}
+.trigger-toggle {
+  width: 34px;
+  flex-shrink: 0;
+}
+.trigger-toggle:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .cue-duration {

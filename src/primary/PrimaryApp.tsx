@@ -13,6 +13,7 @@ import { CueList } from './CueList';
 import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
 import { useOtherPrimaryTabs } from './useOtherPrimaryTabs';
+import { useTimeTriggers } from './useTimeTriggers';
 
 function isTyping(target: EventTarget | null) {
   return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
@@ -44,6 +45,7 @@ export function PrimaryApp() {
   const [mode, setMode] = useMode();
   const locked = mode === 'show';
   const page = currentPage(state);
+  useTimeTriggers(state.show.pages, dispatch);
 
   const outputState: OutputState = useMemo(
     () => ({

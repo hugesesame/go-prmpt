@@ -7,6 +7,10 @@ export interface Cue {
   countdown: boolean;
   /** 出力画面の高さに対する % */
   fontSize: number;
+  /** 自動で実行する時刻（0 時からの秒）。null は時刻トリガー無し */
+  triggerAt: number | null;
+  /** 時刻トリガーを有効にする。手動の GO には関係しない */
+  triggerEnabled: boolean;
 }
 
 /** 最後の Cue を実行した後の選択の移り先 */
@@ -16,6 +20,8 @@ export interface Page {
   id: string;
   name: string;
   afterLast: AfterLast;
+  /** このページの Cue の時刻トリガーを有効にする */
+  timeTriggers: boolean;
   cues: Cue[];
 }
 

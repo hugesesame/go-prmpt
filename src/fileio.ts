@@ -1,5 +1,5 @@
-import { defaultOutput, newCue, overlaySizes, uid } from './defaults';
-import type { AfterLast, Overlay, Page, Show } from './types';
+import { defaultOutput, newCue, newPage, overlaySizes, uid } from './defaults';
+import type { AfterLast, Cue, Overlay, Page, Show } from './types';
 
 export class InvalidShowError extends Error {}
 
@@ -55,9 +55,11 @@ export function parseShow(text: string): Show {
     id: typeof p.id === 'string' ? p.id : uid(),
     name: typeof p.name === 'string' ? p.name : `Page ${i + 1}`,
     afterLast: parseAfterLast(p.afterLast, p.autoAdvance),
-    cues: Array.isArray(p.cues) ? p.cues.map((c) => ({ ...newCue(), ...c })) : [],
+    // 時刻トリガーが無かった頃のファイルはオンで読む
+    timeTriggers: p.timeTriggers !== false,
+    cues: Array.isArray(p.cues) ? p.cues.map(parseCue) : [],
   }));
-  if (pages.length === 0) pages.push({ id: uid(), name: 'Page 1', afterLast: { kind: 'stop' }, cues: [] });
+  if (pages.length === 0) pages.push(newPage('Page 1'));
 
   return {
     version: 1,
@@ -67,6 +69,13 @@ export function parseShow(text: string): Show {
     overlays: Array.isArray(raw.overlays) ? raw.overlays.flatMap(parseOverlay) : [],
     output: { ...defaultOutput, ...output },
   };
+}
+
+function parseCue(value: Partial<Cue>): Cue {
+  const cue = { ...newCue(), ...value };
+  const { triggerAt } = cue;
+  const validTime = Number.isInteger(triggerAt) && triggerAt! >= 0 && triggerAt! < 24 * 60 * 60;
+  return { ...cue, triggerAt: validTime ? triggerAt : null, triggerEnabled: cue.triggerEnabled !== false };
 }
 
 function parseOverlay(value: unknown): Overlay[] {

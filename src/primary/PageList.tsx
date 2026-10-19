@@ -72,6 +72,18 @@ export function PageList({ pages, currentPageId, locked, dispatch }: Props) {
                   {page.afterLast.kind === 'next' ? '→' : `↪${pages.indexOf(target) + 1}`}
                 </span>
               )}
+              {/* 時刻トリガーは本番中に止めたいこともあるのでショーモードでも切り替えられる */}
+              <button
+                className={page.timeTriggers ? 'on-off trigger-toggle active' : 'on-off trigger-toggle'}
+                aria-pressed={page.timeTriggers}
+                title={t('pageTriggerHint')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: 'setPageTimeTriggers', id: page.id, on: !page.timeTriggers });
+                }}
+              >
+                {page.timeTriggers ? 'ON' : 'OFF'}
+              </button>
               {!locked && pages.length > 1 && (
                 <button
                   className="icon-button"

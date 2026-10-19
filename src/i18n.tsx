@@ -44,6 +44,10 @@ const en = {
   emptyText: '(empty)',
   dragToReorder: 'Drag to reorder',
   deleteCue: 'Delete cue',
+  triggerTime: 'Time',
+  triggerTimeHint: 'Run this cue automatically at this time (24h, e.g. 14:30:00). Leave empty for none. Times already passed are skipped.',
+  cueTriggerHint: 'Time trigger of this cue on/off (Space GO still works)',
+  pageTriggerHint: 'Time triggers on this page on/off',
 
   overlays: 'Countdown & Message',
   addCountdown: '+ Countdown',
@@ -121,6 +125,10 @@ const ja: Record<Key, string> = {
   emptyText: '（空のテキスト）',
   dragToReorder: 'ドラッグで並べ替え',
   deleteCue: 'Cue を削除',
+  triggerTime: '時刻',
+  triggerTimeHint: 'この時刻に自動で実行（24 時間表記、例 14:30:00）。空欄なら実行しない。過ぎた時刻は飛ばす',
+  cueTriggerHint: 'この Cue の時刻トリガーのオン／オフ（Space の GO は使える）',
+  pageTriggerHint: 'このページの時刻トリガーのオン／オフ',
 
   overlays: 'カウントダウン・メッセージ',
   addCountdown: '＋ カウントダウン',

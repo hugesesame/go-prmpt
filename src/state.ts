@@ -24,6 +24,7 @@ export type Action =
   | { type: 'selectPage'; id: string }
   | { type: 'selectPageRelative'; delta: number }
   | { type: 'setPageAfterLast'; id: string; value: AfterLast }
+  | { type: 'setPageTimeTriggers'; id: string; on: boolean }
   | { type: 'addCue' }
   | { type: 'updateCue'; id: string; patch: Partial<Omit<Cue, 'id'>> }
   | { type: 'deleteCue'; id: string }
@@ -37,6 +38,8 @@ export type Action =
   /** 出ていなければ出す（カウントダウンは最初から開始）、出ていれば消す。同じ種類は入れ替わる */
   | { type: 'toggleOverlay'; id: string }
   | { type: 'go' }
+  /** 時刻トリガー。開いていないページの Cue でも手動の GO と同じように実行する */
+  | { type: 'fireCue'; pageId: string; cueId: string }
   | { type: 'clear' }
   | { type: 'toggleBlackout' }
   | { type: 'toggleBlink' }
@@ -157,6 +160,8 @@ function reducer(state: AppState, action: Action): AppState {
     }
     case 'setPageAfterLast':
       return updatePage(state, action.id, (p) => ({ ...p, afterLast: action.value }));
+    case 'setPageTimeTriggers':
+      return updatePage(state, action.id, (p) => ({ ...p, timeTriggers: action.on }));
 
     case 'addCue': {
       const page = currentPage(state);
@@ -256,6 +261,11 @@ function reducer(state: AppState, action: Action): AppState {
     case 'go': {
       const page = currentPage(state);
       return fire(state, page, page.cues.findIndex((c) => c.id === state.selectedCueId));
+    }
+    case 'fireCue': {
+      const page = state.show.pages.find((p) => p.id === action.pageId);
+      if (!page) return state;
+      return fire(state, page, page.cues.findIndex((c) => c.id === action.cueId));
     }
     case 'clear':
       return { ...state, live: null };

@@ -15,11 +15,19 @@ export const defaultOutput: OutputSettings = {
 export const fontSizePresets = { S: 15, M: 20, L: 25 } as const;
 
 export function newCue(text = ''): Cue {
-  return { id: uid(), text, duration: 0, countdown: false, fontSize: fontSizePresets.M };
+  return {
+    id: uid(),
+    text,
+    duration: 0,
+    countdown: false,
+    fontSize: fontSizePresets.M,
+    triggerAt: null,
+    triggerEnabled: true,
+  };
 }
 
 export function newPage(name: string, cues: Cue[] = []): Page {
-  return { id: uid(), name, afterLast: { kind: 'stop' }, cues };
+  return { id: uid(), name, afterLast: { kind: 'stop' }, timeTriggers: true, cues };
 }
 
 /** カウントダウンとメッセージの文字の大きさ（出力画面の高さに対する %）の範囲と既定値 */

@@ -109,6 +109,8 @@ export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked
         <span>{t('duration')}</span>
         <span title={t('countdownHint')}>CD</span>
         */}
+        <span className="time-head" title={t('triggerTimeHint')}>{t('triggerTime')}</span>
+        <span />
         <span className="size-head">{t('size')}</span>
         <span />
       </div>
@@ -198,6 +200,24 @@ export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked
               onChange={(e) => dispatch({ type: 'updateCue', id: cue.id, patch: { countdown: e.target.checked } })}
             />
             */}
+            <TimeInput
+              key={cue.triggerAt}
+              seconds={cue.triggerAt}
+              off={!cue.triggerEnabled || !page.timeTriggers}
+              readOnly={locked}
+              title={t('triggerTimeHint')}
+              onCommit={(triggerAt) => dispatch({ type: 'updateCue', id: cue.id, patch: { triggerAt } })}
+            />
+            {/* 時刻トリガーだけのオン／オフ。手動の GO や ↑↓ の選択には関係しない。ショーモードでも切り替えられる */}
+            <button
+              className={cue.triggerEnabled ? 'on-off trigger-toggle active' : 'on-off trigger-toggle'}
+              aria-pressed={cue.triggerEnabled}
+              disabled={cue.triggerAt === null}
+              title={t('cueTriggerHint')}
+              onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { triggerEnabled: !cue.triggerEnabled } })}
+            >
+              {cue.triggerEnabled ? 'ON' : 'OFF'}
+            </button>
             <div className="size-presets" title={t('cueSizeHint')}>
               {Object.entries(fontSizePresets).map(([label, size]) => (
                 <button
@@ -238,6 +258,57 @@ function useAutoFollow() {
   const [on, setOn] = useState(() => localStorage.getItem(AUTO_FOLLOW_KEY) !== 'off');
   useEffect(() => localStorage.setItem(AUTO_FOLLOW_KEY, on ? 'on' : 'off'), [on]);
   return [on, setOn] as const;
+}
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/** 0 時からの秒を「14:30:00」にする */
+function formatTimeOfDay(seconds: number) {
+  return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
+}
+
+/** 「14:30」「14:30:05」「1430」「143005」を 0 時からの秒にする。空は null、読めなければ undefined */
+function parseTimeOfDay(text: string): number | null | undefined {
+  const value = text.trim();
+  if (value === '') return null;
+  const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(value) ?? /^(\d{2})(\d{2})(\d{2})?$/.exec(value);
+  if (!match) return undefined;
+  const [h, m, s] = [Number(match[1]), Number(match[2]), Number(match[3] ?? 0)];
+  if (h > 23 || m > 59 || s > 59) return undefined;
+  return h * 3600 + m * 60 + s;
+}
+
+interface TimeInputProps {
+  seconds: number | null;
+  /** トリガーがオフ（Cue かページで）。時刻を薄く表示する */
+  off: boolean;
+  readOnly: boolean;
+  title: string;
+  onCommit: (seconds: number | null) => void;
+}
+
+/** 時刻トリガーの時刻。Enter か欄の外をクリックで確定し、読めない入力は元に戻す */
+function TimeInput({ seconds, off, readOnly, title, onCommit }: TimeInputProps) {
+  const [draft, setDraft] = useState(seconds === null ? '' : formatTimeOfDay(seconds));
+  const commit = () => {
+    const parsed = parseTimeOfDay(draft);
+    if (parsed === undefined || parsed === seconds) setDraft(seconds === null ? '' : formatTimeOfDay(seconds));
+    else onCommit(parsed);
+  };
+  return (
+    <input
+      className={off ? 'cue-time off' : 'cue-time'}
+      value={draft}
+      placeholder="--:--:--"
+      readOnly={readOnly}
+      title={title}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur();
+      }}
+    />
+  );
 }
 
 interface EditorProps {

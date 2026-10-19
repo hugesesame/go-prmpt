@@ -24,6 +24,7 @@ export type Transition = 'dissolve' | 'cut';
 export interface OutputSettings {
   background: string;
   textColor: string;
+  outlineEnabled: boolean;
   /** 出力画面の高さに対する 0.1% 単位 */
   outlineWidth: number;
   outlineColor: string;

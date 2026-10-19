@@ -5,6 +5,7 @@ export const uid = () => crypto.randomUUID();
 export const defaultOutput: OutputSettings = {
   background: '#000000',
   textColor: '#ffffff',
+  outlineEnabled: true,
   outlineWidth: 0,
   outlineColor: '#000000',
   transition: 'dissolve',

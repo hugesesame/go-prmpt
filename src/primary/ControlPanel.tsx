@@ -1,4 +1,5 @@
 import type { Dispatch, ReactNode } from 'react';
+import { ColorPicker } from '../components/ColorPicker';
 import { OutputView } from '../components/OutputView';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
@@ -55,7 +56,13 @@ export function ControlPanel({ state, outputState, dispatch }: Props) {
         <Section title={t('colors')}>
           <ColorField label={t('background')} value={settings.background} onChange={(v) => set({ background: v })} />
           <ColorField label={t('textColor')} value={settings.textColor} onChange={(v) => set({ textColor: v })} />
-          <ColorField label={t('outline')} value={settings.outlineColor} onChange={(v) => set({ outlineColor: v })} />
+          <ColorField
+            label={t('outline')}
+            value={settings.outlineColor}
+            onChange={(v) => set({ outlineColor: v })}
+            enabled={settings.outlineEnabled}
+            onToggle={(v) => set({ outlineEnabled: v })}
+          />
         </Section>
 
         <Section title={t('typography')}>
@@ -105,13 +112,36 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+interface ColorFieldProps {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  /** 指定すると色の横にオン/オフのボタンを出す */
+  enabled?: boolean;
+  onToggle?: (enabled: boolean) => void;
+}
+
+function ColorField({ label, value, onChange, enabled, onToggle }: ColorFieldProps) {
+  // <label> にすると中のクリックがスウォッチに伝わってしまうので <div> にする
   return (
-    <label className="field">
+    <div className={enabled === false ? 'field disabled' : 'field'}>
       <span>{label}</span>
-      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} />
+      <div className="color-cell">
+        <ColorPicker value={value} onChange={onChange} />
+        {onToggle && (
+          <button
+            className={enabled ? 'on-off active' : 'on-off'}
+            role="switch"
+            aria-checked={enabled}
+            aria-label={label}
+            onClick={() => onToggle(!enabled)}
+          >
+            {enabled ? 'ON' : 'OFF'}
+          </button>
+        )}
+      </div>
       <code>{value}</code>
-    </label>
+    </div>
   );
 }
 

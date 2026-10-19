@@ -79,9 +79,11 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
         <span />
         <span>#</span>
         <span>{t('text')}</span>
-        <span>{t('size')}</span>
+        {/* 保留中: Sec / CD（docs/ideas.md 参照）
         <span>{t('duration')}</span>
         <span title={t('countdownHint')}>CD</span>
+        */}
+        <span className="size-head">{t('size')}</span>
         <span />
       </div>
       <div className="cue-list" ref={listRef}>
@@ -149,18 +151,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
                 )}
               </div>
             )}
-            <div className="size-presets" title={t('cueSizeHint')}>
-              {Object.entries(fontSizePresets).map(([label, size]) => (
-                <button
-                  key={label}
-                  className={cue.fontSize === size ? 'active' : ''}
-                  onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { fontSize: size } })}
-                >
-                  {label}
-                </button>
-              ))}
-              <span className="size-value">{cue.fontSize}</span>
-            </div>
+            {/* 保留中: Sec / CD（docs/ideas.md 参照）
             <input
               className="cue-duration"
               type="number"
@@ -180,6 +171,18 @@ export function CueList({ page, pages, selectedCueId, liveCueId, dispatch }: Pro
               title={t('countdownHint')}
               onChange={(e) => dispatch({ type: 'updateCue', id: cue.id, patch: { countdown: e.target.checked } })}
             />
+            */}
+            <div className="size-presets" title={t('cueSizeHint')}>
+              {Object.entries(fontSizePresets).map(([label, size]) => (
+                <button
+                  key={label}
+                  className={cue.fontSize === size ? 'active' : ''}
+                  onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { fontSize: size } })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <button
               className="icon-button"
               aria-label={t('deleteCue')}

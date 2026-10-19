@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import type { LiveCue, OutputSettings, OutputState } from '../types';
-import { formatRemaining, useNow } from '../useNow';
+// 保留中: Sec / CD（docs/ideas.md 参照）
+// import { formatRemaining, useNow } from '../useNow';
 
 interface Layer {
   id: string;
@@ -60,14 +61,17 @@ export function OutputView({ state }: { state: OutputState }) {
 
 function LiveLayer({ layer, settings, fadeMs }: { layer: Layer; settings: OutputSettings; fadeMs: number }) {
   const { live } = layer;
-  const showCountdown = !!live && live.duration > 0 && live.countdown;
-  const now = useNow(100, showCountdown);
+  // 保留中: Sec / CD（docs/ideas.md 参照）
+  // const showCountdown = !!live && live.duration > 0 && live.countdown;
+  // const now = useNow(100, showCountdown);
 
   const textStyle: CSSProperties = {
     color: settings.textColor,
     fontSize: live ? `${live.fontSize}cqh` : undefined,
     WebkitTextStroke:
-      settings.outlineWidth > 0 ? `${settings.outlineWidth * 0.1}cqh ${settings.outlineColor}` : undefined,
+      settings.outlineEnabled && settings.outlineWidth > 0
+        ? `${settings.outlineWidth * 0.1}cqh ${settings.outlineColor}`
+        : undefined,
   };
 
   return (
@@ -80,11 +84,13 @@ function LiveLayer({ layer, settings, fadeMs }: { layer: Layer; settings: Output
           {live.text}
         </div>
       )}
+      {/* 保留中: Sec / CD（docs/ideas.md 参照）
       {showCountdown && (
         <span className="output-countdown" style={{ color: settings.textColor }}>
           {formatRemaining(Math.max(0, live.duration - (now - live.startedAt) / 1000))}
         </span>
       )}
+      */}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { openChannel, openOutputWindow, type ChannelMessage } from '../channel';
+import { VerticalSplit } from '../components/VerticalSplit';
 import { newShow } from '../defaults';
 import { InvalidShowError, isAbort, openShowFromFile, resetFileHandle, saveShowToFile } from '../fileio';
 import { toggleFullscreen, useIsFullscreen } from '../fullscreen';
@@ -9,6 +10,7 @@ import type { OutputState } from '../types';
 import { formatClock, useNow } from '../useNow';
 import { ControlPanel } from './ControlPanel';
 import { CueList } from './CueList';
+import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
 import { useOtherPrimaryTabs } from './useOtherPrimaryTabs';
 
@@ -44,8 +46,15 @@ export function PrimaryApp() {
   const page = currentPage(state);
 
   const outputState: OutputState = useMemo(
-    () => ({ settings: state.show.output, live: state.live, blackout: state.blackout, blink: state.blink }),
-    [state.show.output, state.live, state.blackout, state.blink],
+    () => ({
+      settings: state.show.output,
+      live: state.live,
+      countdown: state.countdown,
+      message: state.message,
+      blackout: state.blackout,
+      blink: state.blink,
+    }),
+    [state.show.output, state.live, state.countdown, state.message, state.blackout, state.blink],
   );
 
   // 出力ウィンドウへ状態を送る。後から開いたウィンドウには hello への返事で送る
@@ -110,8 +119,11 @@ export function PrimaryApp() {
         ArrowLeft: () => dispatch({ type: 'selectPageRelative', delta: -1 }),
         ArrowRight: () => dispatch({ type: 'selectPageRelative', delta: 1 }),
         Escape: () => dispatch({ type: 'clear' }),
+        // 文字キーは入力モード（日本語入力中や Caps Lock）に左右されないようキーの位置で見る
+        KeyX: () => dispatch({ type: 'toggleBlackout' }),
+        KeyB: () => dispatch({ type: 'toggleBlink' }),
       };
-      const action = actions[e.key];
+      const action = actions[e.key] ?? (e.shiftKey ? undefined : actions[e.code]);
       if (!action) return;
       e.preventDefault();
       // ボタンにフォーカスが残っていると Space で二重に押されるので外す
@@ -179,13 +191,33 @@ export function PrimaryApp() {
       )}
       <main className="workspace">
         <PageList pages={state.show.pages} currentPageId={state.currentPageId} locked={locked} dispatch={dispatch} />
-        <CueList
-          page={page}
-          pages={state.show.pages}
-          selectedCueId={state.selectedCueId}
-          liveCueId={state.live?.cueId ?? null}
-          locked={locked}
-          dispatch={dispatch}
+        <VerticalSplit
+          storageKey="prompter.overlayHeight"
+          defaultBottom={190}
+          // Cue リストの見出し（約 76px）と 10 行（39px × 10）に境目の 6px を足したもの
+          minTop={472}
+          minBottom={120}
+          title={t('resizeLists')}
+          top={
+            <CueList
+              page={page}
+              pages={state.show.pages}
+              selectedCueId={state.selectedCueId}
+              liveCueId={state.live?.cueId ?? null}
+              liveKey={state.live?.key ?? null}
+              locked={locked}
+              dispatch={dispatch}
+            />
+          }
+          bottom={
+            <OverlayList
+              overlays={state.show.overlays}
+              liveCountdownId={state.countdown?.overlayId ?? null}
+              liveMessageId={state.message?.overlayId ?? null}
+              locked={locked}
+              dispatch={dispatch}
+            />
+          }
         />
         <ControlPanel state={state} outputState={outputState} locked={locked} dispatch={dispatch} />
       </main>

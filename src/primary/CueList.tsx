@@ -9,6 +9,8 @@ interface Props {
   pages: Page[];
   selectedCueId: string | null;
   liveCueId: string | null;
+  /** GO のたびに変わる。オートフォローのきっかけにする */
+  liveKey: string | null;
   /** ショーモード。Cue の選択だけできる */
   locked: boolean;
   dispatch: Dispatch<Action>;
@@ -21,18 +23,30 @@ function decodeAfterLast(value: string): AfterLast {
   return value === 'next' ? { kind: 'next' } : { kind: 'stop' };
 }
 
-export function CueList({ page, pages, selectedCueId, liveCueId, locked, dispatch }: Props) {
+export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked, dispatch }: Props) {
   const { t } = useLang();
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editOnSelect, setEditOnSelect] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const [autoFollow, setAutoFollow] = useAutoFollow();
 
   // ↑↓ で選択が動いたら見える位置までスクロール
   useEffect(() => {
     listRef.current?.querySelector('.cue-row.selected')?.scrollIntoView({ block: 'nearest' });
   }, [selectedCueId]);
+
+  // オートフォロー：GO したら実行した Cue を一番上に（次に選択された Cue が 2 段目に来る）。
+  // ↑↓ で選択を動かしただけでは動かさない。実行した Cue がこのページに無いときは選択中の Cue を一番上にする
+  useEffect(() => {
+    const list = listRef.current;
+    if (!autoFollow || !list) return;
+    const row = list.querySelector<HTMLElement>('.cue-row.live') ?? list.querySelector<HTMLElement>('.cue-row.selected');
+    if (!row) return;
+    const top = list.scrollTop + row.getBoundingClientRect().top - list.getBoundingClientRect().top;
+    list.scrollTo({ top, behavior: 'smooth' });
+  }, [liveKey, page.id, autoFollow]);
 
   // 「＋ Cue」で追加された Cue（追加後に選択される）をそのまま編集状態にする
   useEffect(() => {
@@ -76,6 +90,14 @@ export function CueList({ page, pages, selectedCueId, liveCueId, locked, dispatc
             </optgroup>
           </select>
         </label>
+        <button
+          className={autoFollow ? 'small follow-toggle active' : 'small follow-toggle'}
+          aria-pressed={autoFollow}
+          title={t('autoFollowHint')}
+          onClick={() => setAutoFollow(!autoFollow)}
+        >
+          {t('autoFollow')}
+        </button>
         {!locked && <button className="small" onClick={addCue}>{t('addCue')}</button>}
       </div>
 
@@ -90,7 +112,7 @@ export function CueList({ page, pages, selectedCueId, liveCueId, locked, dispatc
         <span className="size-head">{t('size')}</span>
         <span />
       </div>
-      <div className="cue-list" ref={listRef}>
+      <div className={autoFollow ? 'cue-list follow' : 'cue-list'} ref={listRef}>
         {page.cues.length === 0 && <div className="empty">{t('noCues')}</div>}
         {page.cues.map((cue, i) => (
           <div
@@ -207,6 +229,15 @@ export function CueList({ page, pages, selectedCueId, liveCueId, locked, dispatc
       </div>
     </section>
   );
+}
+
+const AUTO_FOLLOW_KEY = 'prompter.autoFollow';
+
+/** オートフォローの ON/OFF。操作する人の好みなのでショーファイルではなくブラウザに覚える */
+function useAutoFollow() {
+  const [on, setOn] = useState(() => localStorage.getItem(AUTO_FOLLOW_KEY) !== 'off');
+  useEffect(() => localStorage.setItem(AUTO_FOLLOW_KEY, on ? 'on' : 'off'), [on]);
+  return [on, setOn] as const;
 }
 
 interface EditorProps {

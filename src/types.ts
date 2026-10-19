@@ -32,10 +32,19 @@ export interface OutputSettings {
   transitionMs: number;
 }
 
+/**
+ * メインの Cue とは別に重ねて出すもの。ショー全体で 1 つのリスト。
+ * カウントダウンは画面の上、メッセージは画面の下に出る
+ */
+export type Overlay =
+  | { id: string; kind: 'countdown'; /** 長さ（秒） */ seconds: number; /** 出力画面の高さに対する % */ size: number }
+  | { id: string; kind: 'message'; text: string; /** 点滅させる */ blink: boolean; /** 出力画面の高さに対する % */ size: number };
+
 export interface Show {
   version: 1;
   name: string;
   pages: Page[];
+  overlays: Overlay[];
   output: OutputSettings;
 }
 
@@ -51,10 +60,28 @@ export interface LiveCue {
   startedAt: number;
 }
 
+/** 動いているカウントダウン。残り時間は startedAt から計算するので、どの画面でも同じ値になる */
+export interface LiveCountdown {
+  overlayId: string;
+  seconds: number;
+  size: number;
+  startedAt: number;
+}
+
+/** 出ているメッセージ */
+export interface LiveMessage {
+  overlayId: string;
+  text: string;
+  blink: boolean;
+  size: number;
+}
+
 /** プライマリー → セカンダリーへ送る状態 */
 export interface OutputState {
   settings: OutputSettings;
   live: LiveCue | null;
+  countdown: LiveCountdown | null;
+  message: LiveMessage | null;
   blackout: boolean;
   blink: boolean;
 }

@@ -16,7 +16,7 @@ const en = {
     'Prompter is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
   modeHint: 'PROGRAM: edit the show / SHOW: run the show with editing locked',
   shortcuts:
-    'Space: GO   ↑↓: Select cue   ←→: Switch page   Esc: Clear   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
+    'Space: GO   ↑↓: Select cue   ←→: Switch page   Esc: Clear   X: Black out   B: Blink   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
 
   pages: 'Pages',
   addPage: '+ Page',
@@ -28,6 +28,8 @@ const en = {
 
   pageName: 'Page name',
   afterLastCue: 'After last cue',
+  autoFollow: 'Auto Follow',
+  autoFollowHint: 'On GO, scroll so the cue that just ran is at the top and the next cue is second',
   stop: 'Stop',
   nextPage: 'Next page',
   jumpToPage: 'Go to page',
@@ -42,6 +44,17 @@ const en = {
   emptyText: '(empty)',
   dragToReorder: 'Drag to reorder',
   deleteCue: 'Delete cue',
+
+  overlays: 'Countdown & Message',
+  addCountdown: '+ Countdown',
+  addMessage: '+ Message',
+  noOverlays: 'Add a countdown (shown at the top) or a message (shown at the bottom).',
+  countdownTime: 'Length (m:ss, e.g. 5:00)',
+  messagePlaceholder: 'Message text',
+  overlaySize: 'Text size (% of screen height)',
+  messageBlinkHint: 'Blink this message (takes effect immediately while it is shown)',
+  deleteOverlay: 'Delete',
+  resizeLists: 'Drag to resize',
 
   output: 'Output',
   next: 'NEXT',
@@ -80,7 +93,7 @@ const ja: Record<Key, string> = {
   invalidShowFile: 'Prompter のショーファイルではありません。',
   modeHint: 'PROGRAM：ショーを編集 / SHOW：本番用（編集をロック）',
   otherTabOpen: '他のタブでも Prompter が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
-  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Esc: クリア　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
+  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Esc: クリア　X: ブラックアウト　B: ブリンク　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
 
   pages: 'ページ',
   addPage: '＋ ページ',
@@ -92,6 +105,8 @@ const ja: Record<Key, string> = {
 
   pageName: 'ページ名',
   afterLastCue: '最後の Cue の後',
+  autoFollow: 'オートフォロー',
+  autoFollowHint: 'GO したら、実行した Cue が一番上、次の Cue が 2 段目に来るようにスクロールする',
   stop: '停止',
   nextPage: '次のページ',
   jumpToPage: 'ページへ移動',
@@ -106,6 +121,17 @@ const ja: Record<Key, string> = {
   emptyText: '（空のテキスト）',
   dragToReorder: 'ドラッグで並べ替え',
   deleteCue: 'Cue を削除',
+
+  overlays: 'カウントダウン・メッセージ',
+  addCountdown: '＋ カウントダウン',
+  addMessage: '＋ メッセージ',
+  noOverlays: 'カウントダウン（画面の上に表示）かメッセージ（画面の下に表示）を追加してください。',
+  countdownTime: '長さ（分:秒、例 5:00）',
+  messagePlaceholder: 'メッセージの文言',
+  overlaySize: '文字の大きさ（画面の高さに対する %）',
+  messageBlinkHint: 'このメッセージを点滅させる（出している間に押すとすぐ反映）',
+  deleteOverlay: '削除',
+  resizeLists: 'ドラッグで高さを変更',
 
   output: '出力',
   next: 'NEXT',

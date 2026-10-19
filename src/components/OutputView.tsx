@@ -1,7 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import type { LiveCue, OutputSettings, OutputState } from '../types';
+import type { LiveCountdown, LiveCue, OutputSettings, OutputState } from '../types';
+import { formatCountdown, useNow } from '../useNow';
 // 保留中: Sec / CD（docs/ideas.md 参照）
-// import { formatRemaining, useNow } from '../useNow';
+// import { formatRemaining } from '../useNow';（useNow は上で import 済み）
 
 interface Layer {
   id: string;
@@ -14,7 +15,7 @@ interface Layer {
  * プライマリーのプレビューでも出力ウィンドウでも同じ見た目になる。
  */
 export function OutputView({ state }: { state: OutputState }) {
-  const { settings, live, blackout, blink } = state;
+  const { settings, live, countdown, message, blackout, blink } = state;
   const fadeMs = settings.transition === 'dissolve' ? settings.transitionMs : 0;
   const layerId = live?.key ?? 'empty';
 
@@ -51,10 +52,34 @@ export function OutputView({ state }: { state: OutputState }) {
           />
         ))}
       </div>
+      {countdown && <CountdownOverlay countdown={countdown} color={settings.textColor} />}
+      {message && (
+        <div
+          className={message.blink ? 'overlay-message blink' : 'overlay-message'}
+          style={{ color: settings.textColor, fontSize: `${message.size}cqh` }}
+        >
+          {message.text}
+        </div>
+      )}
+      {/* 暗転はカウントダウンとメッセージも一緒に隠す */}
       <div
         className="output-blackout"
         style={{ opacity: blackout ? 1 : 0, transitionDuration: `${fadeMs}ms` }}
       />
+    </div>
+  );
+}
+
+/** 画面上部のカウントダウン。0 を過ぎたら赤くして経過時間を数える */
+function CountdownOverlay({ countdown, color }: { countdown: LiveCountdown; color: string }) {
+  const now = useNow(100);
+  const remaining = countdown.seconds - (now - countdown.startedAt) / 1000;
+  return (
+    <div
+      className={remaining < 0 ? 'overlay-countdown over' : 'overlay-countdown'}
+      style={{ color: remaining < 0 ? undefined : color, fontSize: `${countdown.size}cqh` }}
+    >
+      {formatCountdown(remaining)}
     </div>
   );
 }

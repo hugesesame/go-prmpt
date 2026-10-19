@@ -357,6 +357,17 @@ input[type='checkbox'] {
   overflow-y: auto;
   flex: 1;
 }
+/* オートフォロー中は、最後の方の Cue も一番上まで送れるよう下に余白を足す（2 行ぶんは残す） */
+.cue-list.follow::after {
+  content: '';
+  display: block;
+  height: calc(100% - 78px);
+}
+.follow-toggle.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06121f;
+}
 .cue-row {
   padding-top: 4px;
   padding-bottom: 4px;
@@ -455,6 +466,116 @@ input[type='checkbox'] {
   padding: 24px;
   color: var(--muted);
   text-align: center;
+}
+
+/* ---------- 上下に分けた中央の列（Cue リスト / カウントダウン・メッセージ） ---------- */
+
+.vsplit {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+}
+.vsplit .panel {
+  border-right: none;
+  height: 100%;
+}
+.vsplit-top {
+  flex: 1;
+  min-height: 0;
+}
+.vsplit-bottom {
+  flex-shrink: 0;
+  min-height: 0;
+}
+.vsplit-handle {
+  flex-shrink: 0;
+  height: 6px;
+  cursor: row-resize;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  touch-action: none;
+}
+.vsplit-handle:hover {
+  background: var(--accent);
+}
+
+/* ---------- カウントダウン・メッセージのリスト ---------- */
+
+.overlay-row {
+  display: grid;
+  grid-template-columns: 22px 40px 1fr 110px 64px 84px 28px;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 12px 4px 9px;
+  border-bottom: 1px solid #1a1d23;
+  border-left: 3px solid transparent;
+}
+.overlay-row:hover {
+  background: #151920;
+}
+.overlay-row:hover .icon-button {
+  visibility: visible;
+}
+.overlay-row.live {
+  border-left-color: var(--live);
+}
+.overlay-row.blinking {
+  animation: bar-blink 1s step-end infinite;
+}
+@keyframes bar-blink {
+  50% {
+    border-left-color: transparent;
+  }
+}
+.overlay-row.drop-target {
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+.overlay-kind {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  border-radius: 4px;
+  padding: 2px 0;
+  background: var(--bg);
+  color: var(--muted);
+}
+.overlay-kind.countdown {
+  color: var(--warn);
+}
+.overlay-kind.message {
+  color: var(--accent);
+}
+.overlay-duration {
+  justify-self: start;
+  width: 90px;
+  font-family: var(--mono);
+}
+.overlay-size {
+  width: 100%;
+}
+.overlay-text,
+.overlay-duration {
+  min-height: 28px;
+}
+.overlay-toggle,
+.overlay-blink {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 0;
+}
+/* メインの BLINK ボタンと同じ見た目 */
+.overlay-blink.active {
+  background: var(--warn);
+  border-color: var(--warn);
+  color: #1d1300;
+}
+.overlay-toggle.active {
+  background: var(--live);
+  border-color: var(--live);
+  color: #04150a;
 }
 
 /* ---------- Controls ---------- */
@@ -757,6 +878,42 @@ input[type='checkbox'] {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+/* カウントダウン（上）とメッセージ（下）。メインの文字と重なっても読めるよう半透明の地を敷く */
+.overlay-countdown {
+  position: absolute;
+  top: 3cqh;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5cqh 3cqh;
+  border-radius: 1.5cqh;
+  background: rgba(0, 0, 0, 0.6);
+  font-family: var(--mono);
+  font-size: 9cqh;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.overlay-countdown.over {
+  color: var(--danger);
+}
+.overlay-message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2.5cqh 6cqw;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 7cqh;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  white-space: pre;
+  overflow: hidden;
+}
+.overlay-message.blink {
+  animation: blink 1s step-end infinite;
+}
+
 .output-blackout {
   background: #000;
   pointer-events: none;

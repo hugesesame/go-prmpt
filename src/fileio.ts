@@ -1,5 +1,5 @@
-import { defaultOutput, newCue, uid } from './defaults';
-import type { AfterLast, Page, Show } from './types';
+import { defaultOutput, newCue, overlaySizes, uid } from './defaults';
+import type { AfterLast, Overlay, Page, Show } from './types';
 
 export class InvalidShowError extends Error {}
 
@@ -63,8 +63,30 @@ export function parseShow(text: string): Show {
     version: 1,
     name: typeof raw.name === 'string' ? raw.name : 'Untitled Show',
     pages,
+    // オーバーレイが無い古いファイルは空のリストで読む
+    overlays: Array.isArray(raw.overlays) ? raw.overlays.flatMap(parseOverlay) : [],
     output: { ...defaultOutput, ...output },
   };
+}
+
+function parseOverlay(value: unknown): Overlay[] {
+  const o = value as Partial<{ id: unknown; kind: unknown; seconds: unknown; text: unknown; blink: unknown; size: unknown }> | null;
+  const id = typeof o?.id === 'string' ? o.id : uid();
+  if (o?.kind === 'countdown') {
+    const seconds = typeof o.seconds === 'number' && o.seconds >= 0 ? o.seconds : 0;
+    return [{ id, kind: 'countdown', seconds, size: parseSize(o.size, 'countdown') }];
+  }
+  if (o?.kind === 'message') {
+    const text = typeof o.text === 'string' ? o.text : '';
+    return [{ id, kind: 'message', text, blink: o.blink === true, size: parseSize(o.size, 'message') }];
+  }
+  return [];
+}
+
+/** 大きさが無い古いデータは既定値、範囲外は範囲に収める */
+function parseSize(value: unknown, kind: Overlay['kind']): number {
+  const { min, max, default: fallback } = overlaySizes[kind];
+  return typeof value === 'number' ? Math.min(max, Math.max(min, value)) : fallback;
 }
 
 /** 旧形式の autoAdvance（true で次のページへ）も読めるようにする */

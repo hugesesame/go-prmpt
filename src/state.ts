@@ -1,13 +1,15 @@
 import { useEffect, useReducer } from 'react';
-import { newCue, newPage, newShow, uid } from './defaults';
+import { newCue, newOverlay, newPage, newShow, uid } from './defaults';
 import { parseShow } from './fileio';
-import type { AfterLast, Cue, LiveCue, OutputSettings, Page, Show } from './types';
+import type { AfterLast, Cue, LiveCountdown, LiveCue, LiveMessage, OutputSettings, Overlay, Page, Show } from './types';
 
 export interface AppState {
   show: Show;
   currentPageId: string;
   selectedCueId: string | null;
   live: LiveCue | null;
+  countdown: LiveCountdown | null;
+  message: LiveMessage | null;
   blackout: boolean;
   blink: boolean;
 }
@@ -28,6 +30,12 @@ export type Action =
   | { type: 'moveCue'; from: number; to: number }
   | { type: 'selectCue'; id: string | null }
   | { type: 'selectCueRelative'; delta: number }
+  | { type: 'addOverlay'; kind: Overlay['kind'] }
+  | { type: 'updateOverlay'; id: string; patch: { seconds?: number; text?: string; blink?: boolean; size?: number } }
+  | { type: 'deleteOverlay'; id: string }
+  | { type: 'moveOverlay'; from: number; to: number }
+  /** 出ていなければ出す（カウントダウンは最初から開始）、出ていれば消す。同じ種類は入れ替わる */
+  | { type: 'toggleOverlay'; id: string }
   | { type: 'go' }
   | { type: 'clear' }
   | { type: 'toggleBlackout' }
@@ -54,6 +62,8 @@ function withShow(show: Show): AppState {
     currentPageId: page.id,
     selectedCueId: page.cues[0]?.id ?? null,
     live: null,
+    countdown: null,
+    message: null,
     blackout: false,
     blink: false,
   };
@@ -194,6 +204,53 @@ function reducer(state: AppState, action: Action): AppState {
             : cues.length - 1
           : Math.max(0, Math.min(cues.length - 1, index + action.delta));
       return { ...state, selectedCueId: cues[target].id };
+    }
+
+    case 'addOverlay':
+      return { ...state, show: { ...state.show, overlays: [...state.show.overlays, newOverlay(action.kind)] } };
+    case 'updateOverlay': {
+      const overlays = state.show.overlays.map((o) =>
+        o.id !== action.id
+          ? o
+          : o.kind === 'countdown'
+            ? { ...o, seconds: action.patch.seconds ?? o.seconds, size: action.patch.size ?? o.size }
+            : {
+                ...o,
+                text: action.patch.text ?? o.text,
+                blink: action.patch.blink ?? o.blink,
+                size: action.patch.size ?? o.size,
+              },
+      );
+      const next = { ...state, show: { ...state.show, overlays } };
+      // 出ているものは書き直した文言・点滅・大きさにすぐ差し替える（長さは次に開始したときから）
+      const { text, blink, size } = action.patch;
+      if (next.message?.overlayId === action.id) {
+        const m = next.message;
+        return { ...next, message: { ...m, text: text ?? m.text, blink: blink ?? m.blink, size: size ?? m.size } };
+      }
+      if (next.countdown?.overlayId === action.id && size !== undefined) {
+        return { ...next, countdown: { ...next.countdown, size } };
+      }
+      return next;
+    }
+    case 'deleteOverlay':
+      return {
+        ...state,
+        show: { ...state.show, overlays: state.show.overlays.filter((o) => o.id !== action.id) },
+        countdown: state.countdown?.overlayId === action.id ? null : state.countdown,
+        message: state.message?.overlayId === action.id ? null : state.message,
+      };
+    case 'moveOverlay':
+      return { ...state, show: { ...state.show, overlays: move(state.show.overlays, action.from, action.to) } };
+    case 'toggleOverlay': {
+      const overlay = state.show.overlays.find((o) => o.id === action.id);
+      if (!overlay) return state;
+      if (overlay.kind === 'countdown') {
+        if (state.countdown?.overlayId === overlay.id) return { ...state, countdown: null };
+        return { ...state, countdown: { overlayId: overlay.id, seconds: overlay.seconds, size: overlay.size, startedAt: Date.now() } };
+      }
+      if (state.message?.overlayId === overlay.id) return { ...state, message: null };
+      return { ...state, message: { overlayId: overlay.id, text: overlay.text, blink: overlay.blink, size: overlay.size } };
     }
 
     case 'go': {

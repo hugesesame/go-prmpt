@@ -14,6 +14,16 @@ export function formatClock(ms: number) {
   return new Date(ms).toLocaleTimeString('ja-JP', { hour12: false });
 }
 
+/** 残り時間は切り上げて表示し、0 を過ぎたら経過時間に - を付けて表示する（例 4:59、-0:12、1:00:00） */
+export function formatCountdown(remaining: number) {
+  const s = remaining >= 0 ? Math.ceil(remaining) : Math.floor(-remaining);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const ss = String(s % 60).padStart(2, '0');
+  const body = h > 0 ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`;
+  return remaining >= 0 ? body : `-${body}`;
+}
+
 export function formatRemaining(seconds: number) {
   const s = Math.ceil(seconds);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;

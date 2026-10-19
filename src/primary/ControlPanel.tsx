@@ -45,13 +45,13 @@ export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
             className={state.blackout ? 'toggle-button blackout active' : 'toggle-button blackout'}
             onClick={() => dispatch({ type: 'toggleBlackout' })}
           >
-            BLACK OUT
+            BLACK OUT <small>X</small>
           </button>
           <button
             className={state.blink ? 'toggle-button blink active' : 'toggle-button blink'}
             onClick={() => dispatch({ type: 'toggleBlink' })}
           >
-            BLINK
+            BLINK <small>B</small>
           </button>
         </div>
 

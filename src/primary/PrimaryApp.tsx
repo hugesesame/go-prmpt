@@ -20,8 +20,11 @@ import { useTimecodeEngine } from './timecodeEngine';
 import { TimecodeDisplay } from './TimecodeSection';
 import { useTimeTriggers } from './useTimeTriggers';
 
+/** 文字を打つ欄にフォーカスがある。スライダー・チェックボックス・選択肢はボタンと同じく扱い、Space などのショートカットを効かせる */
 function isTyping(target: EventTarget | null) {
-  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+  if (!(target instanceof HTMLElement)) return false;
+  if (target instanceof HTMLInputElement) return !/^(range|checkbox|radio|button|color)$/.test(target.type);
+  return target.isContentEditable || target.tagName === 'TEXTAREA';
 }
 
 type Mode = 'program' | 'show';

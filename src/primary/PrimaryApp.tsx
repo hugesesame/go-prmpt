@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { openChannel, openOutputWindow, type ChannelMessage } from '../channel';
 import { VerticalSplit } from '../components/VerticalSplit';
+import { buildCsvImport, NoTextColumnError, parseCsv, type CsvImport } from '../csv';
 import { newShow } from '../defaults';
-import { InvalidShowError, isAbort, openShowFromFile, resetFileHandle, saveShowToFile } from '../fileio';
+import { InvalidShowError, isAbort, openCsvFile, openShowFromFile, resetFileHandle, saveShowToFile } from '../fileio';
 import { toggleFullscreen, useIsFullscreen } from '../fullscreen';
 import { useLang } from '../i18n';
 import { currentPage, useAppState } from '../state';
 import type { OutputState } from '../types';
 import { formatClock, useNow } from '../useNow';
 import { ControlPanel } from './ControlPanel';
+import { CsvImportDialog } from './CsvImportDialog';
 import { CueList } from './CueList';
 import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
@@ -32,7 +34,7 @@ function useMode() {
 
 /** ダブルクリックが独自の意味を持つ要素（文字選択・Cue 実行・ボタン連打）ではフルスクリーンにしない */
 function onBackgroundDoubleClick(e: MouseEvent) {
-  if ((e.target as HTMLElement).closest('input, textarea, select, button, .cue-row, .page-item')) return;
+  if ((e.target as HTMLElement).closest('input, textarea, select, button, dialog, .cue-row, .page-item')) return;
   toggleFullscreen();
 }
 
@@ -41,6 +43,7 @@ export function PrimaryApp() {
   const [state, dispatch] = useAppState();
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [csvImport, setCsvImport] = useState<{ fileName: string; result: CsvImport } | null>(null);
   const fullscreen = useIsFullscreen();
   const otherTabs = useOtherPrimaryTabs();
   const [mode, setMode] = useMode();
@@ -83,6 +86,7 @@ export function PrimaryApp() {
     } catch (err) {
       if (isAbort(err)) return;
       if (err instanceof InvalidShowError) setError(t('invalidShowFile'));
+      else if (err instanceof NoTextColumnError) setError(t('csvNoTextColumn'));
       else setError(err instanceof Error ? err.message : String(err));
     }
   };
@@ -92,6 +96,12 @@ export function PrimaryApp() {
       const { show, fileName } = await openShowFromFile();
       dispatch({ type: 'loadShow', show });
       setFileName(fileName);
+    });
+  const importCsv = () =>
+    run(async () => {
+      const { text, fileName } = await openCsvFile();
+      const pageNames = state.show.pages.map((p) => p.name);
+      setCsvImport({ fileName, result: buildCsvImport(parseCsv(text), fileName, pageNames) });
     });
   const createNew = () => {
     if (!confirm(t('confirmNew'))) return;
@@ -104,6 +114,8 @@ export function PrimaryApp() {
   keyHandlers.current = { save, open, locked };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // ダイアログを開いている間は Space の GO なども効かないようにする
+      if (document.querySelector('dialog[open]')) return;
       if (e.metaKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         keyHandlers.current.save(e.shiftKey);
@@ -195,7 +207,13 @@ export function PrimaryApp() {
       <main className="workspace">
         <div className="side">
           <Transport state={state} dispatch={dispatch} />
-          <PageList pages={state.show.pages} currentPageId={state.currentPageId} locked={locked} dispatch={dispatch} />
+          <PageList
+            pages={state.show.pages}
+            currentPageId={state.currentPageId}
+            locked={locked}
+            onImportCsv={importCsv}
+            dispatch={dispatch}
+          />
         </div>
         <VerticalSplit
           storageKey="prompter.overlayHeight"
@@ -228,6 +246,17 @@ export function PrimaryApp() {
         <ControlPanel state={state} outputState={outputState} locked={locked} dispatch={dispatch} />
       </main>
       <footer className="statusbar">{t('shortcuts')}</footer>
+      {csvImport && (
+        <CsvImportDialog
+          fileName={csvImport.fileName}
+          result={csvImport.result}
+          onImport={() => {
+            dispatch({ type: 'importPages', pages: csvImport.result.pages });
+            setCsvImport(null);
+          }}
+          onCancel={() => setCsvImport(null)}
+        />
+      )}
     </div>
   );
 }

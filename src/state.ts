@@ -18,6 +18,8 @@ export type Action =
   | { type: 'loadShow'; show: Show }
   | { type: 'renameShow'; name: string }
   | { type: 'addPage' }
+  /** CSV から作ったページを末尾に足し、最初のページを開く */
+  | { type: 'importPages'; pages: Page[] }
   | { type: 'renamePage'; id: string; name: string }
   | { type: 'deletePage'; id: string }
   | { type: 'movePage'; from: number; to: number }
@@ -123,6 +125,16 @@ function reducer(state: AppState, action: Action): AppState {
         show: { ...state.show, pages: [...state.show.pages, page] },
         currentPageId: page.id,
         selectedCueId: page.cues[0].id,
+      };
+    }
+    case 'importPages': {
+      const [page] = action.pages;
+      if (!page) return state;
+      return {
+        ...state,
+        show: { ...state.show, pages: [...state.show.pages, ...action.pages] },
+        currentPageId: page.id,
+        selectedCueId: page.cues[0]?.id ?? null,
       };
     }
     case 'renamePage':

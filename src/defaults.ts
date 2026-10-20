@@ -13,6 +13,8 @@ export const defaultOutput: OutputSettings = {
 };
 
 export const fontSizePresets = { S: 15, M: 20, L: 25 } as const;
+/** Cue の文字サイズ（出力画面の高さに対する %）の範囲 */
+export const cueSizeRange = { min: 5, max: 40 } as const;
 
 export function newCue(text = ''): Cue {
   return {

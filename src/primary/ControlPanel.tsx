@@ -1,6 +1,7 @@
 import type { Dispatch, ReactNode } from 'react';
 import { ColorPicker } from '../components/ColorPicker';
 import { OutputView } from '../components/OutputView';
+import { cueSizeRange } from '../defaults';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
 import type { OutputSettings, OutputState } from '../types';
@@ -47,8 +48,8 @@ export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
             <Slider
               label={t('cueSize')}
               title={t('cueSizeHint')}
-              min={5}
-              max={40}
+              min={cueSizeRange.min}
+              max={cueSizeRange.max}
               step={0.5}
               value={nextCue?.fontSize}
               onChange={(v) => nextCue && dispatch({ type: 'updateCue', id: nextCue.id, patch: { fontSize: v } })}

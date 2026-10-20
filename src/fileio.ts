@@ -1,3 +1,4 @@
+import { decodeCsv } from './csv';
 import { defaultOutput, newCue, newPage, overlaySizes, uid } from './defaults';
 import type { AfterLast, Cue, Overlay, Page, Show } from './types';
 
@@ -36,6 +37,15 @@ export async function openShowFromFile(): Promise<{ show: Show; fileName: string
   const show = parseShow(await (await handle.getFile()).text());
   fileHandle = handle;
   return { show, fileName: handle.name };
+}
+
+/** CSV を選んで中身の文字列を返す。ショーのファイルとは別なので上書き保存先は変えない */
+export async function openCsvFile(): Promise<{ text: string; fileName: string }> {
+  const [handle] = await window.showOpenFilePicker({
+    types: [{ description: 'CSV', accept: { 'text/csv': ['.csv'] } }],
+  });
+  const file = await handle.getFile();
+  return { text: decodeCsv(await file.arrayBuffer()), fileName: file.name };
 }
 
 /** 読み込んだ JSON を検証し、欠けている項目は既定値で補う */

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState, type Dispatch } from 'react';
 import { fontSizePresets } from '../defaults';
 import { useLang } from '../i18n';
 import type { Action } from '../state';
+import { formatTimeOfDay, parseTimeOfDay } from '../timeOfDay';
 import type { AfterLast, Page } from '../types';
 
 interface Props {
@@ -258,24 +259,6 @@ function useAutoFollow() {
   const [on, setOn] = useState(() => localStorage.getItem(AUTO_FOLLOW_KEY) !== 'off');
   useEffect(() => localStorage.setItem(AUTO_FOLLOW_KEY, on ? 'on' : 'off'), [on]);
   return [on, setOn] as const;
-}
-
-const pad = (n: number) => String(n).padStart(2, '0');
-
-/** 0 時からの秒を「14:30:00」にする */
-function formatTimeOfDay(seconds: number) {
-  return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
-}
-
-/** 「14:30」「14:30:05」「1430」「143005」を 0 時からの秒にする。空は null、読めなければ undefined */
-function parseTimeOfDay(text: string): number | null | undefined {
-  const value = text.trim();
-  if (value === '') return null;
-  const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(value) ?? /^(\d{2})(\d{2})(\d{2})?$/.exec(value);
-  if (!match) return undefined;
-  const [h, m, s] = [Number(match[1]), Number(match[2]), Number(match[3] ?? 0)];
-  if (h > 23 || m > 59 || s > 59) return undefined;
-  return h * 3600 + m * 60 + s;
 }
 
 interface TimeInputProps {

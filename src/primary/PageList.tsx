@@ -8,10 +8,11 @@ interface Props {
   currentPageId: string;
   /** ショーモード。ページの選択だけできる */
   locked: boolean;
+  onImportCsv: () => void;
   dispatch: Dispatch<Action>;
 }
 
-export function PageList({ pages, currentPageId, locked, dispatch }: Props) {
+export function PageList({ pages, currentPageId, locked, onImportCsv, dispatch }: Props) {
   const { t } = useLang();
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
@@ -26,7 +27,10 @@ export function PageList({ pages, currentPageId, locked, dispatch }: Props) {
       <div className="panel-header">
         <span>{t('pages')}</span>
         {!locked && (
-          <button className="small" onClick={() => dispatch({ type: 'addPage' })}>{t('addPage')}</button>
+          <div className="toolbar-group">
+            <button className="small" title={t('importCsvHint')} onClick={onImportCsv}>{t('importCsv')}</button>
+            <button className="small" onClick={() => dispatch({ type: 'addPage' })}>{t('addPage')}</button>
+          </div>
         )}
       </div>
       <ol className="page-list">

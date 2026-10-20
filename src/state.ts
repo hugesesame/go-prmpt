@@ -1,7 +1,19 @@
 import { useEffect, useReducer } from 'react';
 import { newCue, newOverlay, newPage, newShow, uid } from './defaults';
 import { parseShow } from './fileio';
-import type { AfterLast, Cue, LiveCountdown, LiveCue, LiveMessage, OutputSettings, Overlay, Page, Show } from './types';
+import type {
+  AfterLast,
+  Cue,
+  LiveCountdown,
+  LiveCue,
+  LiveMessage,
+  OutputSettings,
+  Overlay,
+  Page,
+  Show,
+  TimecodeSettings,
+  TriggerSource,
+} from './types';
 
 export interface AppState {
   show: Show;
@@ -27,6 +39,7 @@ export type Action =
   | { type: 'selectPageRelative'; delta: number }
   | { type: 'setPageAfterLast'; id: string; value: AfterLast }
   | { type: 'setPageTimeTriggers'; id: string; on: boolean }
+  | { type: 'setPageTriggerSource'; id: string; source: TriggerSource }
   | { type: 'addCue' }
   | { type: 'updateCue'; id: string; patch: Partial<Omit<Cue, 'id'>> }
   | { type: 'deleteCue'; id: string }
@@ -45,7 +58,8 @@ export type Action =
   | { type: 'clear' }
   | { type: 'toggleBlackout' }
   | { type: 'toggleBlink' }
-  | { type: 'setOutput'; patch: Partial<OutputSettings> };
+  | { type: 'setOutput'; patch: Partial<OutputSettings> }
+  | { type: 'setTimecode'; patch: Partial<TimecodeSettings> };
 
 const STORAGE_KEY = 'prompter.show.v1';
 
@@ -174,6 +188,8 @@ function reducer(state: AppState, action: Action): AppState {
       return updatePage(state, action.id, (p) => ({ ...p, afterLast: action.value }));
     case 'setPageTimeTriggers':
       return updatePage(state, action.id, (p) => ({ ...p, timeTriggers: action.on }));
+    case 'setPageTriggerSource':
+      return updatePage(state, action.id, (p) => ({ ...p, triggerSource: action.source }));
 
     case 'addCue': {
       const page = currentPage(state);
@@ -287,6 +303,8 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, blink: !state.blink };
     case 'setOutput':
       return { ...state, show: { ...state.show, output: { ...state.show.output, ...action.patch } } };
+    case 'setTimecode':
+      return { ...state, show: { ...state.show, timecode: { ...state.show.timecode, ...action.patch } } };
   }
 }
 

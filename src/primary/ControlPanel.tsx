@@ -5,16 +5,19 @@ import { cueSizeRange } from '../defaults';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
 import type { OutputSettings, OutputState } from '../types';
+import { TimecodeSection } from './TimecodeSection';
+import type { TimecodeEngine } from './timecodeEngine';
 
 interface Props {
   state: AppState;
   outputState: OutputState;
+  timecode: TimecodeEngine;
   /** ショーモード。出力の設定を変えられないようにする */
   locked: boolean;
   dispatch: Dispatch<Action>;
 }
 
-export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
+export function ControlPanel({ state, outputState, timecode, locked, dispatch }: Props) {
   const { t } = useLang();
   const settings = state.show.output;
   const set = (patch: Partial<OutputSettings>) => dispatch({ type: 'setOutput', patch });
@@ -78,6 +81,8 @@ export function ControlPanel({ state, outputState, locked, dispatch }: Props) {
             )}
           </Section>
         </fieldset>
+
+        <TimecodeSection engine={timecode} settings={state.show.timecode} locked={locked} dispatch={dispatch} />
       </div>
     </aside>
   );

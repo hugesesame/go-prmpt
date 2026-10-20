@@ -15,7 +15,7 @@ function timeOnDay(day: number, seconds: number) {
 function dueCues(pages: Page[], from: number, to: number) {
   const due: { pageId: string; cueId: string; at: number }[] = [];
   for (const page of pages) {
-    if (!page.timeTriggers) continue;
+    if (!page.timeTriggers || page.triggerSource !== 'clock') continue;
     for (const cue of page.cues) {
       if (!cue.triggerEnabled || cue.triggerAt === null) continue;
       // 0 時をまたいだときのために、前回の確認の日と今日の両方で見る

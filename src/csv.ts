@@ -1,4 +1,5 @@
 import { cueSizeRange, fontSizePresets, newCue, newPage } from './defaults';
+import { formatTc, parseTc } from './timecode';
 import { parseTimeOfDay } from './timeOfDay';
 import type { Page } from './types';
 
@@ -80,6 +81,11 @@ export function parseCsv(text: string): string[][] {
   return rows;
 }
 
+/** 「01:02:15:12」「01:02:15;12」「01021512」のようにフレームまで書いてある */
+function isTimecodeText(text: string) {
+  return text.split(/[:;.]/).length === 4 || /^\d{8}$/.test(text);
+}
+
 /** S / M / L か数値（% を付けてもよい）。空は null、読めなければ undefined */
 function parseCueSize(text: string): number | null | undefined {
   const value = text.trim().toUpperCase();
@@ -132,9 +138,17 @@ export function buildCsvImport(rows: string[][], fileName: string, existingPageN
     pageName = get('page').trim() || pageName;
     const cue = newCue(get('text').replace(/\r\n?/g, '\n').trim());
 
-    const time = parseTimeOfDay(get('time'));
-    if (time === undefined) warnings.push({ row, column: 'time', value: get('time').trim() });
-    else cue.triggerAt = time;
+    // フレームまで書いた「01:02:15:12」はタイムコード、それ以外は時計の時刻
+    const timeText = get('time').trim();
+    if (isTimecodeText(timeText)) {
+      const tc = parseTc(timeText);
+      if (tc) cue.tcAt = formatTc(tc);
+      else warnings.push({ row, column: 'time', value: timeText });
+    } else {
+      const time = parseTimeOfDay(timeText);
+      if (time === undefined) warnings.push({ row, column: 'time', value: timeText });
+      else cue.triggerAt = time;
+    }
 
     const size = parseCueSize(get('size'));
     if (size === undefined) {
@@ -154,6 +168,11 @@ export function buildCsvImport(rows: string[][], fileName: string, existingPageN
   });
 
   const taken = new Set(existingPageNames);
-  const pages = [...groups].map(([name, cues]) => newPage(uniqueName(name, taken), cues));
+  const pages = [...groups].map(([name, cues]) => {
+    const page = newPage(uniqueName(name, taken), cues);
+    // タイムコードだけが書かれたページは TC で実行する
+    if (cues.some((c) => c.tcAt !== null) && cues.every((c) => c.triggerAt === null)) page.triggerSource = 'tc';
+    return page;
+  });
   return { pages, warnings };
 }

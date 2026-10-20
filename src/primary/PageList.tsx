@@ -76,6 +76,17 @@ export function PageList({ pages, currentPageId, locked, onImportCsv, dispatch }
                   {page.afterLast.kind === 'next' ? '→' : `↪${pages.indexOf(target) + 1}`}
                 </span>
               )}
+              <button
+                className={page.triggerSource === 'tc' ? 'source-toggle tc' : 'source-toggle'}
+                disabled={locked}
+                title={t('pageSourceHint')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: 'setPageTriggerSource', id: page.id, source: page.triggerSource === 'tc' ? 'clock' : 'tc' });
+                }}
+              >
+                {page.triggerSource === 'tc' ? 'TC' : 'CLK'}
+              </button>
               {/* 時刻トリガーは本番中に止めたいこともあるのでショーモードでも切り替えられる */}
               <button
                 className={page.timeTriggers ? 'on-off trigger-toggle active' : 'on-off trigger-toggle'}

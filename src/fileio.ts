@@ -1,6 +1,7 @@
 import { decodeCsv } from './csv';
-import { defaultOutput, newCue, newPage, overlaySizes, uid } from './defaults';
-import type { AfterLast, Cue, Overlay, Page, Show } from './types';
+import { defaultOutput, defaultTimecode, newCue, newPage, overlaySizes, uid } from './defaults';
+import { formatTc, frameRates, parseTc } from './timecode';
+import type { AfterLast, Cue, Overlay, Page, Show, TimecodeSettings } from './types';
 
 export class InvalidShowError extends Error {}
 
@@ -67,6 +68,7 @@ export function parseShow(text: string): Show {
     afterLast: parseAfterLast(p.afterLast, p.autoAdvance),
     // 時刻トリガーが無かった頃のファイルはオンで読む
     timeTriggers: p.timeTriggers !== false,
+    triggerSource: p.triggerSource === 'tc' ? 'tc' : 'clock',
     cues: Array.isArray(p.cues) ? p.cues.map(parseCue) : [],
   }));
   if (pages.length === 0) pages.push(newPage('Page 1'));
@@ -78,6 +80,18 @@ export function parseShow(text: string): Show {
     // オーバーレイが無い古いファイルは空のリストで読む
     overlays: Array.isArray(raw.overlays) ? raw.overlays.flatMap(parseOverlay) : [],
     output: { ...defaultOutput, ...output },
+    timecode: parseTimecodeSettings(raw.timecode),
+  };
+}
+
+/** タイムコードが無かった頃のファイルは既定値（使わない）で読む */
+function parseTimecodeSettings(value: unknown): TimecodeSettings {
+  const v = value as Partial<TimecodeSettings> | undefined;
+  const start = typeof v?.start === 'string' ? parseTc(v.start) : null;
+  return {
+    source: v?.source === 'mtc' || v?.source === 'internal' ? v.source : 'off',
+    frameRate: frameRates.find((r) => r === v?.frameRate) ?? defaultTimecode.frameRate,
+    start: start ? formatTc(start) : defaultTimecode.start,
   };
 }
 
@@ -85,7 +99,13 @@ function parseCue(value: Partial<Cue>): Cue {
   const cue = { ...newCue(), ...value };
   const { triggerAt } = cue;
   const validTime = Number.isInteger(triggerAt) && triggerAt! >= 0 && triggerAt! < 24 * 60 * 60;
-  return { ...cue, triggerAt: validTime ? triggerAt : null, triggerEnabled: cue.triggerEnabled !== false };
+  const tc = typeof cue.tcAt === 'string' ? parseTc(cue.tcAt) : null;
+  return {
+    ...cue,
+    triggerAt: validTime ? triggerAt : null,
+    tcAt: tc ? formatTc(tc) : null,
+    triggerEnabled: cue.triggerEnabled !== false,
+  };
 }
 
 function parseOverlay(value: unknown): Overlay[] {

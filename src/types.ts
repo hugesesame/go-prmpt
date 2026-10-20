@@ -1,3 +1,5 @@
+import type { FrameRate } from './timecode';
+
 export interface Cue {
   id: string;
   text: string;
@@ -9,7 +11,9 @@ export interface Cue {
   fontSize: number;
   /** 自動で実行する時刻（0 時からの秒）。null は時刻トリガー無し */
   triggerAt: number | null;
-  /** 時刻トリガーを有効にする。手動の GO には関係しない */
+  /** タイムコードで実行する位置（「01:02:15:12」）。null はトリガー無し。ページが TC のときに使う */
+  tcAt: string | null;
+  /** 時刻・タイムコードのトリガーを有効にする。手動の GO には関係しない */
   triggerEnabled: boolean;
 }
 
@@ -20,9 +24,24 @@ export interface Page {
   id: string;
   name: string;
   afterLast: AfterLast;
-  /** このページの Cue の時刻トリガーを有効にする */
+  /** このページの Cue の時刻・タイムコードのトリガーを有効にする */
   timeTriggers: boolean;
+  /** Cue を時計の時刻（clock）とタイムコード（tc）のどちらで実行するか */
+  triggerSource: TriggerSource;
   cues: Cue[];
+}
+
+export type TriggerSource = 'clock' | 'tc';
+
+/** off: 使わない / mtc: 外部の MTC を受ける / internal: アプリの中で生成する */
+export type TimecodeSource = 'off' | 'mtc' | 'internal';
+
+export interface TimecodeSettings {
+  source: TimecodeSource;
+  /** 内部生成の fps。受信のときは届いた MTC の fps を使う */
+  frameRate: FrameRate;
+  /** 内部生成の開始位置（⏮ で戻る位置） */
+  start: string;
 }
 
 export type Transition = 'dissolve' | 'cut';
@@ -52,6 +71,7 @@ export interface Show {
   pages: Page[];
   overlays: Overlay[];
   output: OutputSettings;
+  timecode: TimecodeSettings;
 }
 
 /** 現在セカンダリー画面に出ている Cue */

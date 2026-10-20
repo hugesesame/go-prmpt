@@ -43,7 +43,7 @@ export function CsvImportDialog({ fileName, result, onImport, onCancel }: Props)
                 <tr key={page.id}>
                   <td>{page.name}</td>
                   <td className="num">{page.cues.length}</td>
-                  <td className="num">{page.cues.filter((c) => c.triggerAt !== null).length}</td>
+                  <td className="num">{page.cues.filter((c) => c.triggerAt !== null || c.tcAt !== null).length}</td>
                   <td className="first-cue">{page.cues[0].text.replace(/\n/g, ' ↵ ') || t('emptyText')}</td>
                 </tr>
               ))}

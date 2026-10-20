@@ -340,7 +340,7 @@ input[type='checkbox'] {
 .cue-row {
   display: grid;
   /* 保留中の Sec / CD 列を戻すときは 1fr の後に 64px 32px を足す */
-  grid-template-columns: 22px 34px 1fr 76px 34px 92px 28px;
+  grid-template-columns: 22px 34px 1fr 108px 34px 92px 28px;
   gap: 6px;
   align-items: center;
   padding: 0 12px;
@@ -1082,4 +1082,107 @@ input[type='checkbox'] {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
+}
+
+/* ---------- Timecode ---------- */
+
+.tc-header {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.tc-header + .clock {
+  margin-left: 28px;
+}
+.tc-header-transport {
+  display: flex;
+  gap: 4px;
+}
+.tc-header-transport button {
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+}
+.tc-header-transport button.active {
+  background: var(--go);
+  border-color: var(--go);
+  color: #052e13;
+}
+.tc-display {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.tc-display.running {
+  color: var(--live);
+}
+.tc-label,
+.tc-rate {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.tc-value {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ロック用の入れ物。レイアウトには影響させない */
+.tc-settings {
+  display: contents;
+}
+.tc-settings:disabled > * {
+  opacity: 0.45;
+}
+.segmented.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+.tc-start {
+  font-family: var(--mono);
+  background: var(--panel-raised);
+  border-color: var(--border);
+}
+.midi-notice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--warn);
+}
+.tc-transport {
+  display: grid;
+  grid-template-columns: 1fr 1fr 44px;
+  gap: 6px;
+}
+.tc-transport .tc-play.active {
+  background: var(--go);
+  border-color: var(--go);
+  color: #052e13;
+  font-weight: 700;
+}
+
+.source-toggle {
+  height: 22px;
+  width: 34px;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.source-toggle.tc {
+  color: var(--warn);
+  border-color: #5c4310;
+}
+.source-toggle:disabled {
+  opacity: 1;
 }

@@ -16,6 +16,8 @@ import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
 import { Transport } from './Transport';
 import { useOtherPrimaryTabs } from './useOtherPrimaryTabs';
+import { useTimecodeEngine } from './timecodeEngine';
+import { TimecodeDisplay } from './TimecodeSection';
 import { useTimeTriggers } from './useTimeTriggers';
 
 function isTyping(target: EventTarget | null) {
@@ -50,6 +52,7 @@ export function PrimaryApp() {
   const locked = mode === 'show';
   const page = currentPage(state);
   useTimeTriggers(state.show.pages, dispatch);
+  const timecode = useTimecodeEngine(state.show.pages, state.show.timecode, dispatch);
 
   const outputState: OutputState = useMemo(
     () => ({
@@ -161,6 +164,7 @@ export function PrimaryApp() {
           aria-label={t('showName')}
         />
         <span className="file-name">{fileName ?? t('unsaved')}</span>
+        <TimecodeDisplay engine={timecode} source={state.show.timecode.source} />
         <Clock />
       </header>
       <nav className="toolbar">
@@ -243,7 +247,7 @@ export function PrimaryApp() {
             />
           }
         />
-        <ControlPanel state={state} outputState={outputState} locked={locked} dispatch={dispatch} />
+        <ControlPanel state={state} outputState={outputState} timecode={timecode} locked={locked} dispatch={dispatch} />
       </main>
       <footer className="statusbar">{t('shortcuts')}</footer>
       {csvImport && (

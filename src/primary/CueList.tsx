@@ -3,6 +3,7 @@ import { fontSizePresets } from '../defaults';
 import { useLang } from '../i18n';
 import type { Action } from '../state';
 import { formatTimeOfDay, parseTimeOfDay } from '../timeOfDay';
+import { TcInput } from './TcInput';
 import type { AfterLast, Page } from '../types';
 
 interface Props {
@@ -32,6 +33,8 @@ export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked
   const [editOnSelect, setEditOnSelect] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const [autoFollow, setAutoFollow] = useAutoFollow();
+  /** このページの Cue をタイムコードで実行する */
+  const tc = page.triggerSource === 'tc';
 
   // ↑↓ で選択が動いたら見える位置までスクロール
   useEffect(() => {
@@ -110,7 +113,9 @@ export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked
         <span>{t('duration')}</span>
         <span title={t('countdownHint')}>CD</span>
         */}
-        <span className="time-head" title={t('triggerTimeHint')}>{t('triggerTime')}</span>
+        <span className="time-head" title={tc ? t('triggerTcHint') : t('triggerTimeHint')}>
+          {tc ? 'TC' : t('triggerTime')}
+        </span>
         <span />
         <span className="size-head">{t('size')}</span>
         <span />
@@ -201,19 +206,31 @@ export function CueList({ page, pages, selectedCueId, liveCueId, liveKey, locked
               onChange={(e) => dispatch({ type: 'updateCue', id: cue.id, patch: { countdown: e.target.checked } })}
             />
             */}
-            <TimeInput
-              key={cue.triggerAt}
-              seconds={cue.triggerAt}
-              off={!cue.triggerEnabled || !page.timeTriggers}
-              readOnly={locked}
-              title={t('triggerTimeHint')}
-              onCommit={(triggerAt) => dispatch({ type: 'updateCue', id: cue.id, patch: { triggerAt } })}
-            />
-            {/* 時刻トリガーだけのオン／オフ。手動の GO や ↑↓ の選択には関係しない。ショーモードでも切り替えられる */}
+            {tc ? (
+              <TcInput
+                key={cue.tcAt}
+                value={cue.tcAt}
+                allowEmpty
+                className={!cue.triggerEnabled || !page.timeTriggers ? 'cue-time off' : 'cue-time'}
+                readOnly={locked}
+                title={t('triggerTcHint')}
+                onCommit={(tcAt) => dispatch({ type: 'updateCue', id: cue.id, patch: { tcAt } })}
+              />
+            ) : (
+              <TimeInput
+                key={cue.triggerAt}
+                seconds={cue.triggerAt}
+                off={!cue.triggerEnabled || !page.timeTriggers}
+                readOnly={locked}
+                title={t('triggerTimeHint')}
+                onCommit={(triggerAt) => dispatch({ type: 'updateCue', id: cue.id, patch: { triggerAt } })}
+              />
+            )}
+            {/* 時刻・TC のトリガーだけのオン／オフ。手動の GO や ↑↓ の選択には関係しない。ショーモードでも切り替えられる */}
             <button
               className={cue.triggerEnabled ? 'on-off trigger-toggle active' : 'on-off trigger-toggle'}
               aria-pressed={cue.triggerEnabled}
-              disabled={cue.triggerAt === null}
+              disabled={(tc ? cue.tcAt : cue.triggerAt) === null}
               title={t('cueTriggerHint')}
               onClick={() => dispatch({ type: 'updateCue', id: cue.id, patch: { triggerEnabled: !cue.triggerEnabled } })}
             >

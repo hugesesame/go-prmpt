@@ -1,4 +1,4 @@
-import type { Cue, OutputSettings, Overlay, Page, Show } from './types';
+import type { Cue, OutputSettings, Overlay, Page, Show, TimecodeSettings } from './types';
 
 export const uid = () => crypto.randomUUID();
 
@@ -10,6 +10,12 @@ export const defaultOutput: OutputSettings = {
   outlineColor: '#000000',
   transition: 'dissolve',
   transitionMs: 500,
+};
+
+export const defaultTimecode: TimecodeSettings = {
+  source: 'off',
+  frameRate: '30',
+  start: '01:00:00:00',
 };
 
 export const fontSizePresets = { S: 15, M: 20, L: 25 } as const;
@@ -24,12 +30,13 @@ export function newCue(text = ''): Cue {
     countdown: false,
     fontSize: fontSizePresets.M,
     triggerAt: null,
+    tcAt: null,
     triggerEnabled: true,
   };
 }
 
 export function newPage(name: string, cues: Cue[] = []): Page {
-  return { id: uid(), name, afterLast: { kind: 'stop' }, timeTriggers: true, cues };
+  return { id: uid(), name, afterLast: { kind: 'stop' }, timeTriggers: true, triggerSource: 'clock', cues };
 }
 
 /** カウントダウンとメッセージの文字の大きさ（出力画面の高さに対する %）の範囲と既定値 */
@@ -52,5 +59,6 @@ export function newShow(): Show {
     pages: [newPage('Page 1', [newCue('Welcome'), newCue('')])],
     overlays: [newOverlay('countdown'), newOverlay('message')],
     output: { ...defaultOutput },
+    timecode: { ...defaultTimecode },
   };
 }

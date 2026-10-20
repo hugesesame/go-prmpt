@@ -766,18 +766,29 @@ input[type='checkbox'] {
   min-height: 2.8em;
 }
 
+/* 暗い現場でまぶしくないよう、普段は枠と文字だけ。NEXT の枠と同じ緑 */
 .go-button {
-  background: var(--go);
-  border-color: var(--go);
-  color: #04150a;
+  background: var(--bg);
+  border: 2px solid var(--go);
+  color: var(--go);
   font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.1em;
-  padding: 14px;
+  padding: 13px;
 }
 .go-button:hover:not(:disabled) {
-  background: #3ddc76;
+  background: #12261a;
   border-color: #3ddc76;
+  color: #3ddc76;
+}
+.go-button.flash {
+  animation: go-flash 450ms ease-out;
+}
+@keyframes go-flash {
+  from {
+    background: var(--go);
+    color: #04150a;
+  }
 }
 
 .transport {

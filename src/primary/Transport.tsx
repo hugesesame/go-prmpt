@@ -14,7 +14,13 @@ export function Transport({ state, dispatch }: Props) {
 
   return (
     <div className="transport-panel">
-      <button className="go-button" disabled={!nextCue} onClick={() => dispatch({ type: 'go' })}>
+      {/* Cue が出るたびに作り直し、一瞬だけ緑に光らせる（Space・時刻や TC のトリガーでも光る） */}
+      <button
+        key={state.live?.key ?? 'idle'}
+        className={state.live ? 'go-button flash' : 'go-button'}
+        disabled={!nextCue}
+        onClick={() => dispatch({ type: 'go' })}
+      >
         GO <small>Space</small>
       </button>
       <div className="next-cue">

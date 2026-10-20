@@ -657,25 +657,83 @@ input[type='checkbox'] {
 .preview.next {
   border-color: var(--go);
 }
-.preview-head {
-  margin-bottom: -6px;
+.program-bar {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  background: var(--panel-raised);
+  border: 1px solid var(--danger);
+  border-bottom-color: transparent;
+  border-radius: 6px 6px 0 0;
+  margin-bottom: -10px;
+}
+.program-bar + .preview.program {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.program-bar-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  text-align: left;
-}
-.preview-head.program {
   color: var(--danger);
 }
-button.preview-head.next {
-  padding: 0;
-  border: none;
-  background: none;
+/* NEXT の見出しの帯。押せることが分かるよう、帯にも右端の三角にも枠を付ける */
+.next-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px 4px 10px;
+  text-align: left;
+  border-color: #1f4d30;
+}
+.next-bar:hover:not(:disabled) {
+  border-color: var(--go);
+  background: #12261a;
+}
+/* 開いているときは下の画面とつなげる */
+.next-bar.open {
+  border-color: var(--go);
+  margin-bottom: -10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+.next-bar.open + .preview.next {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.next-bar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   color: var(--go);
 }
-button.preview-head.next:hover {
-  background: none;
-  color: #3ddc76;
+.next-bar-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.next-bar-chevron {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 22px;
+  font-size: 9px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.next-bar-chevron span {
+  display: inline-block;
+  transition: transform 0.15s;
+}
+.next-bar:not(.open) .next-bar-chevron span {
+  transform: rotate(-90deg);
 }
 .preview-empty {
   position: absolute;

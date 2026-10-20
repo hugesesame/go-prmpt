@@ -31,17 +31,27 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
         <span>{t('output')}</span>
       </div>
       <div className="controls-body">
-        <div className="preview-head program">PROGRAM</div>
+        {/* NEXT の帯と形をそろえる。押せないのでボタンは付けない */}
+        <div className="program-bar">
+          <span className="program-bar-label">PROGRAM</span>
+        </div>
         <div className="preview program">
           <OutputView state={outputState} />
         </div>
+        {/* 見出しの帯全体で開閉する。閉じているときは次の Cue の文字を帯に出す */}
         <button
-          className="preview-head next"
+          className={showNext ? 'next-bar open' : 'next-bar'}
           aria-expanded={showNext}
           title={t('nextPreviewHint')}
           onClick={() => setShowNext(!showNext)}
         >
-          {showNext ? '▾' : '▸'} NEXT
+          <span className="next-bar-label">NEXT</span>
+          <span className="next-bar-text">
+            {!showNext && (nextCue ? nextCue.text.replace(/\n/g, ' ↵ ') || t('emptyText') : t('noNextCue'))}
+          </span>
+          <span className="next-bar-chevron" aria-hidden>
+            <span>▼</span>
+          </span>
         </button>
         {showNext && (
           <div className="preview next">

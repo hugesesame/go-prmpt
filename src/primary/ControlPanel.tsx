@@ -1,10 +1,10 @@
-import type { Dispatch, ReactNode } from 'react';
+import { useEffect, useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { ColorPicker } from '../components/ColorPicker';
 import { OutputView } from '../components/OutputView';
 import { cueSizeRange } from '../defaults';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
-import type { OutputSettings, OutputState } from '../types';
+import type { Cue, OutputSettings, OutputState } from '../types';
 import { TimecodeSection } from './TimecodeSection';
 import type { TimecodeEngine } from './timecodeEngine';
 
@@ -22,6 +22,8 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
   const settings = state.show.output;
   const set = (patch: Partial<OutputSettings>) => dispatch({ type: 'setOutput', patch });
   const nextCue = currentPage(state).cues.find((c) => c.id === state.selectedCueId);
+  const [showNext, setShowNext] = useShowNext();
+  const nextState = useNextState(nextCue, settings);
 
   return (
     <aside className="panel controls">
@@ -29,9 +31,24 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
         <span>{t('output')}</span>
       </div>
       <div className="controls-body">
-        <div className="preview">
+        <div className="preview-head program">PROGRAM</div>
+        <div className="preview program">
           <OutputView state={outputState} />
         </div>
+        <button
+          className="preview-head next"
+          aria-expanded={showNext}
+          title={t('nextPreviewHint')}
+          onClick={() => setShowNext(!showNext)}
+        >
+          {showNext ? '▾' : '▸'} NEXT
+        </button>
+        {showNext && (
+          <div className="preview next">
+            <OutputView state={nextState} />
+            {!nextCue && <div className="preview-empty">{t('noNextCue')}</div>}
+          </div>
+        )}
 
         {/* disabled な fieldset は中のボタン・スライダーをまとめて無効にする */}
         <fieldset className="settings" disabled={locked}>
@@ -85,6 +102,43 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
         <TimecodeSection engine={timecode} settings={state.show.timecode} locked={locked} dispatch={dispatch} />
       </div>
     </aside>
+  );
+}
+
+const SHOW_NEXT_KEY = 'prompter.showNext';
+
+/** NEXT の画面を開いておくか。操作する人の好みなのでブラウザに覚える */
+function useShowNext() {
+  const [on, setOn] = useState(() => localStorage.getItem(SHOW_NEXT_KEY) !== 'off');
+  useEffect(() => localStorage.setItem(SHOW_NEXT_KEY, on ? 'on' : 'off'), [on]);
+  return [on, setOn] as const;
+}
+
+/**
+ * NEXT の画面に渡す状態。次の Cue の文字だけを今の色・アウトラインで出す。
+ * カウントダウン・メッセージ・暗転・点滅は出さず、選択を変えたときはフェードさせずに切り替える
+ */
+function useNextState(cue: Cue | undefined, settings: OutputSettings): OutputState {
+  return useMemo(
+    () => ({
+      settings: { ...settings, transition: 'cut' },
+      live: cue
+        ? {
+            key: cue.id,
+            cueId: cue.id,
+            text: cue.text,
+            duration: cue.duration,
+            countdown: cue.countdown,
+            fontSize: cue.fontSize,
+            startedAt: 0,
+          }
+        : null,
+      countdown: null,
+      message: null,
+      blackout: false,
+      blink: false,
+    }),
+    [cue, settings],
   );
 }
 

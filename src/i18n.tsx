@@ -98,6 +98,8 @@ const en = {
   resizeLists: 'Drag to resize',
 
   output: 'Output',
+  nextPreviewHint: 'Show or hide the preview of the cue that runs on the next GO',
+  noNextCue: 'No next cue',
   next: 'NEXT',
   colors: 'Colors',
   background: 'Background',
@@ -216,6 +218,8 @@ const ja: Record<Key, string> = {
   resizeLists: 'ドラッグで高さを変更',
 
   output: '出力',
+  nextPreviewHint: '次の GO で出る Cue のプレビューを表示／非表示',
+  noNextCue: '次の Cue はありません',
   next: 'NEXT',
   colors: 'カラー',
   background: '背景',

@@ -644,10 +644,46 @@ input[type='checkbox'] {
   opacity: 0.45;
 }
 .preview {
+  position: relative;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
+}
+/* スイッチャーのモニターと同じく、本番の画面は赤、次は緑 */
+.preview.program {
+  border-color: var(--danger);
+}
+.preview.next {
+  border-color: var(--go);
+}
+.preview-head {
+  margin-bottom: -6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+.preview-head.program {
+  color: var(--danger);
+}
+button.preview-head.next {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--go);
+}
+button.preview-head.next:hover {
+  background: none;
+  color: #3ddc76;
+}
+.preview-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .next-cue {

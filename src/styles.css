@@ -595,8 +595,10 @@ input[type='checkbox'] {
   width: 90px;
   font-family: var(--mono);
 }
+/* 右列のスライダーと同じ色 */
 .overlay-size {
   width: 100%;
+  accent-color: var(--accent);
 }
 .overlay-text,
 .overlay-duration {

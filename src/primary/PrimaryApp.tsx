@@ -163,7 +163,7 @@ export function PrimaryApp() {
   return (
     <div className={locked ? 'app show-mode' : 'app'} onDoubleClick={onBackgroundDoubleClick}>
       <header className="topbar">
-        <div className="brand">PROMPTER</div>
+        <div className="brand">GO PRMPT</div>
         <input
           className="show-name"
           value={state.show.name}

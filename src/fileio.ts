@@ -6,7 +6,7 @@ import type { AfterLast, Cue, Overlay, Page, Show, TimecodeSettings } from './ty
 export class InvalidShowError extends Error {}
 
 const fileTypes: FilePickerAcceptType[] = [
-  { description: 'Prompter Show', accept: { 'application/json': ['.json'] } },
+  { description: 'GO PRMPT Show', accept: { 'application/json': ['.json'] } },
 ];
 
 let fileHandle: FileSystemFileHandle | null = null;

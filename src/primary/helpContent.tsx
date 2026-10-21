@@ -15,7 +15,7 @@ const ja: HelpSection[] = [
     title: 'はじめに',
     body: (
       <>
-        <p>Prompter は、Cue リストに並べた文言を、別ウィンドウ（出力ウィンドウ）に順番に出すアプリです。Chrome で使います。</p>
+        <p>GO PRMPT（ゴー・プロンプト）は、Cue リストに並べた文言を、別ウィンドウ（出力ウィンドウ）に順番に出すアプリです。Chrome で使います。</p>
         <h4>画面の構成</h4>
         <ul>
           <li><b>左</b>：GO・CLEAR・BLACK OUT・BLINK の操作ボタンと、ページの一覧</li>
@@ -283,7 +283,7 @@ const en: HelpSection[] = [
     title: 'Getting started',
     body: (
       <>
-        <p>Prompter shows the lines in your cue list, one after another, in a separate output window. Use it in Chrome.</p>
+        <p>GO PRMPT (pronounced "Go Prompt") shows the lines in your cue list, one after another, in a separate output window. Use it in Chrome.</p>
         <h4>Screen layout</h4>
         <ul>
           <li><b>Left</b>: the GO, CLEAR, BLACK OUT and BLINK buttons, and the page list</li>

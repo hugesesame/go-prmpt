@@ -11,9 +11,9 @@ const en = {
   saveAs: 'Save As',
   openOutput: 'Open Output',
   confirmNew: 'Create a new show? Unsaved changes will be lost.',
-  invalidShowFile: 'This is not a Prompter show file.',
+  invalidShowFile: 'This is not a GO PRMPT show file.',
   otherTabOpen:
-    'Prompter is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
+    'GO PRMPT is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
   modeHint: 'PROGRAM: edit the show / SHOW: run the show with editing locked',
   shortcuts:
     'Space: GO   ↑↓: Select cue   ←→: Switch page   Z: Clear   X: Black out   B: Blink   F: Fullscreen   ?: Help   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
@@ -152,9 +152,9 @@ const ja: Record<Key, string> = {
   saveAs: '別名で保存',
   openOutput: '出力ウィンドウを開く',
   confirmNew: '新規ショーを作成します。保存していない変更は失われます。',
-  invalidShowFile: 'Prompter のショーファイルではありません。',
+  invalidShowFile: 'GO PRMPT のショーファイルではありません。',
   modeHint: 'PROGRAM：ショーを編集 / SHOW：本番用（編集をロック）',
-  otherTabOpen: '他のタブでも Prompter が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
+  otherTabOpen: '他のタブでも GO PRMPT が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
   shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Z: クリア　X: ブラックアウト　B: ブリンク　F: フルスクリーン　?: ヘルプ　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
 
   pages: 'ページ',

@@ -12,7 +12,7 @@ export function OutputWindow() {
   const [cursorIdle, setCursorIdle] = useState(false);
 
   useEffect(() => {
-    document.title = 'Prompter Output';
+    document.title = 'GO PRMPT Output';
     const channel = openChannel();
     channel.onmessage = (e: MessageEvent<ChannelMessage>) => {
       if (e.data.type === 'state') setState(e.data.state);

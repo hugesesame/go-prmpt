@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "name": "Spring Live 2026",
+  "pages": [
+    {
+      "id": "00996815-9b62-4cd3-a247-53e2b4e53dfb",
+      "name": "Opening",
+      "afterLast": {
+        "kind": "next"
+      },
+      "timeTriggers": true,
+      "triggerSource": "clock",
+      "cues": [
+        {
+          "id": "f0afd002-51a6-478d-88ad-cdf1eb46a04f",
+          "text": "Doors open\nPlease take your seats",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": 66600,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "c985ae94-15e5-408f-aab0-2e2ec02e7c54",
+          "text": "The show starts in 5 minutes",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": 68100,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "7b230f02-726e-4ee4-8c60-1ea4c38ea6cb",
+          "text": "Please switch off\nyour phones",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": 68280,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "95a33a49-d901-4327-abd4-8fc58945b77d",
+          "text": "SPRING LIVE 2026",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 25,
+          "triggerAt": 68400,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "622f5012-232a-426c-abca-4c77a400131e",
+          "text": "Welcome, everyone!",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 25,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "125f3daf-02c5-4b42-9094-665aa871ad9d",
+      "name": "Song 1 – Blue Horizon",
+      "afterLast": {
+        "kind": "next"
+      },
+      "timeTriggers": true,
+      "triggerSource": "tc",
+      "cues": [
+        {
+          "id": "667ade50-e750-4753-a147-a6081de585fd",
+          "text": "Intro — 8 bars",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 15,
+          "triggerAt": null,
+          "tcAt": "01:00:00:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "a7ce6688-5375-4f2e-9905-9d7b6051991a",
+          "text": "Verse 1",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": "01:00:12:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "eabdb578-aec7-46b0-81c4-cc564221972f",
+          "text": "Look up, the sky is waking\nThe city hums a brand-new tune",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 15,
+          "triggerAt": null,
+          "tcAt": "01:00:14:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "4d167d92-1239-4c21-b52f-73993e1b8b08",
+          "text": "Every light a little promise\nShining just for you",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 15,
+          "triggerAt": null,
+          "tcAt": "01:00:22:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "19e93e05-3251-4c84-b49f-7ed86cf45fe2",
+          "text": "Chorus ×2",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": "01:00:30:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "68ecc2e5-94a3-463f-8d2e-418761a22d50",
+          "text": "Blue horizon, here we go\nHand in hand, nice and slow",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 15,
+          "triggerAt": null,
+          "tcAt": "01:00:32:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "c3f179f4-d0f4-44ea-9309-5a1128db2258",
+          "text": "Guitar solo",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": "01:00:48:00",
+          "triggerEnabled": true
+        },
+        {
+          "id": "2583d54a-afcf-4503-9a33-e33df83f54cb",
+          "text": "Big finish — hold the last note",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 15,
+          "triggerAt": null,
+          "tcAt": "01:01:10:00",
+          "triggerEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "6d46cba6-72c3-41ce-b1cd-e287a2f1fd56",
+      "name": "MC",
+      "afterLast": {
+        "kind": "next"
+      },
+      "timeTriggers": true,
+      "triggerSource": "clock",
+      "cues": [
+        {
+          "id": "c42c79df-9464-431a-ac7f-c968cac4ffbf",
+          "text": "Thank you!",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 25,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "1a0dbd88-7673-4644-b2d0-1d8df0c8fe68",
+          "text": "Introduce the band",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "473d134c-d0de-41a1-8714-f5493d1a1813",
+          "text": "Next song:\n\"Midnight Train\"",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "f047b704-22c7-42fc-93ce-86de3d142552",
+          "text": "Sing along!",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 25,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        }
+      ]
+    },
+    {
+      "id": "cb8384f5-ac34-4c0a-b36c-09a7526b8921",
+      "name": "Encore",
+      "afterLast": {
+        "kind": "stop"
+      },
+      "timeTriggers": true,
+      "triggerSource": "clock",
+      "cues": [
+        {
+          "id": "784b45b0-3cab-4048-931e-55176f0bee31",
+          "text": "ENCORE",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 25,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "dc132ca2-518b-4041-9dd4-af5d6d27c4d1",
+          "text": "One more song!",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "51ad6dbe-7be4-4aec-81f1-610cf797ea9c",
+          "text": "Thank you for coming!\nSee you next spring",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": null,
+          "tcAt": null,
+          "triggerEnabled": true
+        },
+        {
+          "id": "26e5f256-2c90-4a7f-9f91-3aa4b7ec21c7",
+          "text": "Please exit safely",
+          "duration": 0,
+          "countdown": false,
+          "fontSize": 20,
+          "triggerAt": 75600,
+          "tcAt": null,
+          "triggerEnabled": true
+        }
+      ]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "65ef7911-0dc5-4276-8ba1-c7594396adfa",
+      "kind": "countdown",
+      "seconds": 300,
+      "size": 9
+    },
+    {
+      "id": "f2a3ac0f-1a19-40dc-958f-40211df0991f",
+      "kind": "countdown",
+      "seconds": 900,
+      "size": 9
+    },
+    {
+      "id": "1ccef582-4479-41c2-93b5-f1d5251ed2c0",
+      "kind": "message",
+      "text": "Wrap up in 2 minutes",
+      "blink": false,
+      "size": 7
+    },
+    {
+      "id": "8b735ee5-6976-4f74-948c-50b3438fa9e0",
+      "kind": "message",
+      "text": "Hold — technical issue",
+      "blink": true,
+      "size": 7
+    },
+    {
+      "id": "1a54d206-e3e9-4783-a8bd-d88b3f0fb6bc",
+      "kind": "message",
+      "text": "Great job! Keep going",
+      "blink": false,
+      "size": 7
+    }
+  ],
+  "output": {
+    "background": "#000000",
+    "textColor": "#ffffff",
+    "outlineEnabled": true,
+    "outlineWidth": 4,
+    "outlineColor": "#000000",
+    "transition": "dissolve",
+    "transitionMs": 500
+  },
+  "timecode": {
+    "source": "internal",
+    "frameRate": "30",
+    "start": "01:00:00:00"
+  }
+}

@@ -18,6 +18,9 @@ export const defaultTimecode: TimecodeSettings = {
   start: '01:00:00:00',
 };
 
+/** 左の列（操作ボタンとページ一覧）の幅（px）。境目のドラッグで変えられる */
+export const sideWidthRange = { min: 220, max: 420, default: 250 } as const;
+
 export const fontSizePresets = { S: 15, M: 20, L: 25 } as const;
 /** Cue の文字サイズ（出力画面の高さに対する %）の範囲 */
 export const cueSizeRange = { min: 5, max: 40 } as const;

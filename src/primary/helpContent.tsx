@@ -18,7 +18,7 @@ const ja: HelpSection[] = [
         <p>GO PRMPT（ゴー・プロンプト）は、Cue リストに並べた文言を、別ウィンドウ（出力ウィンドウ）に順番に出すアプリです。Chrome で使います。</p>
         <h4>画面の構成</h4>
         <ul>
-          <li><b>左</b>：GO・CLEAR・BLACK OUT・BLINK の操作ボタンと、ページの一覧</li>
+          <li><b>左</b>：GO・CLEAR・BLACK OUT・BLINK の操作ボタンと、ページの一覧（右端の境目をドラッグで幅を変えられます。ダブルクリックで元の幅に戻ります）</li>
           <li><b>中央</b>：今のページの Cue リストと、その下にカウントダウン・メッセージのリスト（境目はドラッグで高さを変えられます）</li>
           <li><b>右</b>：出力のプレビュー（PROGRAM＝今出ているもの、NEXT＝次に出るもの）と、出力・タイムコードの設定</li>
         </ul>
@@ -82,7 +82,7 @@ const ja: HelpSection[] = [
         <p>Cue リストはページごとに分けられます。たとえば 1 曲 1 ページにすると、本番中に探しやすくなります。</p>
         <ul>
           <li><b>追加</b>：ページ一覧の「＋ ページ」。名前は Cue リストの上の欄で変えられます。</li>
-          <li><b>切り替え</b>：クリックか <kbd>←</kbd> <kbd>→</kbd>。</li>
+          <li><b>切り替え</b>：クリックか <kbd>←</kbd> <kbd>→</kbd>。ページにマウスを重ねると、名前と Cue の数が出ます。</li>
           <li><b>並べ替え</b>：ドラッグ。<b>削除</b>は ×（Cue があるときは確認が出ます）。</li>
           <li><b>最後の Cue の後</b>：ページの最後の Cue を GO した後、「停止」「次のページ」「ページへ移動」（ページを指定）から選べます。自動で進むページには一覧に → や ↪ が付きます。</li>
           <li><b>CLK / TC</b>：このページの Cue を時計の時刻（CLK）とタイムコード（TC）のどちらで自動実行するか（「時刻・TC トリガー」参照）。</li>
@@ -286,7 +286,7 @@ const en: HelpSection[] = [
         <p>GO PRMPT (pronounced "Go Prompt") shows the lines in your cue list, one after another, in a separate output window. Use it in Chrome.</p>
         <h4>Screen layout</h4>
         <ul>
-          <li><b>Left</b>: the GO, CLEAR, BLACK OUT and BLINK buttons, and the page list</li>
+          <li><b>Left</b>: the GO, CLEAR, BLACK OUT and BLINK buttons, and the page list (drag its right edge to resize; double-click to reset)</li>
           <li><b>Center</b>: the cue list of the current page, with the countdown and message list below it (drag the divider to resize)</li>
           <li><b>Right</b>: output previews (PROGRAM = on air now, NEXT = runs on the next GO) and the output and timecode settings</li>
         </ul>
@@ -348,7 +348,7 @@ const en: HelpSection[] = [
         <p>Split your cues into pages. For example, one page per song makes cues easy to find during the show.</p>
         <ul>
           <li><b>Add</b>: "+ Page" in the page list. Rename it in the field above the cue list.</li>
-          <li><b>Switch</b>: click a page, or use <kbd>←</kbd> <kbd>→</kbd>.</li>
+          <li><b>Switch</b>: click a page, or use <kbd>←</kbd> <kbd>→</kbd>. Hover over a page to see its full name and number of cues.</li>
           <li><b>Reorder</b>: drag. <b>Delete</b>: × (asks first if the page has cues).</li>
           <li><b>After last cue</b>: what happens after GO on the last cue of the page: Stop, Next page, or Go to page. Pages that move on automatically show → or ↪ in the list.</li>
           <li><b>CLK / TC</b>: whether this page's cues run automatically by the clock (CLK) or by timecode (TC). See "Time and TC triggers".</li>

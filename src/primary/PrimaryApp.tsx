@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { openChannel, openOutputWindow, type ChannelMessage } from '../channel';
+import { ColumnResizer, useColumnWidth } from '../components/ColumnResizer';
 import { VerticalSplit } from '../components/VerticalSplit';
 import { buildCsvImport, NoTextColumnError, parseCsv, type CsvImport } from '../csv';
-import { newShow } from '../defaults';
+import { newShow, sideWidthRange } from '../defaults';
 import { InvalidShowError, isAbort, openCsvFile, openShowFromFile, resetFileHandle, saveShowToFile } from '../fileio';
 import { toggleFullscreen, useIsFullscreen } from '../fullscreen';
 import { useLang } from '../i18n';
@@ -40,7 +41,7 @@ function useMode() {
 
 /** ダブルクリックが独自の意味を持つ要素（文字選択・Cue 実行・ボタン連打・NEXT の編集）ではフルスクリーンにしない */
 function onBackgroundDoubleClick(e: MouseEvent) {
-  if ((e.target as HTMLElement).closest('input, textarea, select, button, dialog, .cue-row, .page-item, .preview.next')) return;
+  if ((e.target as HTMLElement).closest('input, textarea, select, button, dialog, .cue-row, .page-item, .preview.next, .column-resizer')) return;
   toggleFullscreen();
 }
 
@@ -51,6 +52,7 @@ export function PrimaryApp() {
   const [error, setError] = useState<string | null>(null);
   const [csvImport, setCsvImport] = useState<{ fileName: string; result: CsvImport } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [sideWidth, setSideWidth] = useColumnWidth('prompter.sideWidth', sideWidthRange);
   const fullscreen = useIsFullscreen();
   const otherTabs = useOtherPrimaryTabs();
   const [mode, setMode] = useMode();
@@ -218,8 +220,13 @@ export function PrimaryApp() {
           {error}
         </div>
       )}
-      <main className="workspace">
+      <main className="workspace" style={{ gridTemplateColumns: `${sideWidth}px 1fr 360px` }}>
         <div className="side">
+          <ColumnResizer
+            title={t('resizeSide')}
+            onResize={setSideWidth}
+            onReset={() => setSideWidth(sideWidthRange.default)}
+          />
           <Transport state={state} dispatch={dispatch} />
           <PageList
             pages={state.show.pages}

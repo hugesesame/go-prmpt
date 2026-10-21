@@ -112,6 +112,8 @@ const en = {
   messageBlinkHint: 'Blink this message (takes effect immediately while it is shown)',
   deleteOverlay: 'Delete',
   resizeLists: 'Drag to resize',
+  resizeSide: 'Drag to resize (double-click to reset)',
+  pageTooltip: '{name} — {count} cues',
 
   output: 'Output',
   nextPreviewHint: 'Show or hide the preview of the cue that runs on the next GO',
@@ -251,6 +253,8 @@ const ja: Record<Key, string> = {
   messageBlinkHint: 'このメッセージを点滅させる（出している間に押すとすぐ反映）',
   deleteOverlay: '削除',
   resizeLists: 'ドラッグで高さを変更',
+  resizeSide: 'ドラッグで幅を変更（ダブルクリックで元の幅に戻す）',
+  pageTooltip: '{name} — Cue {count} 個',
 
   output: '出力',
   nextPreviewHint: '次の GO で出る Cue のプレビューを表示／非表示',

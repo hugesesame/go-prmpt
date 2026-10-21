@@ -47,6 +47,8 @@ export function PageList({ pages, currentPageId, locked, onImportCsv, dispatch }
                 .filter(Boolean)
                 .join(' ')}
               draggable={!locked}
+              // Cue の数は場所を取るので一覧には出さず、マウスを重ねたときに出す
+              title={t('pageTooltip', { name: page.name || t('untitled'), count: String(page.cues.length) })}
               onClick={() => dispatch({ type: 'selectPage', id: page.id })}
               onDragStart={() => setDragFrom(i)}
               onDragOver={(e) => {
@@ -63,7 +65,6 @@ export function PageList({ pages, currentPageId, locked, onImportCsv, dispatch }
             >
               <span className="page-index">{i + 1}</span>
               <span className="page-name">{page.name || t('untitled')}</span>
-              <span className="page-count">{page.cues.length}</span>
               {target && (
                 <span
                   className="page-auto"

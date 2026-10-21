@@ -73,3 +73,7 @@ npm run dev
 | `src/i18n.tsx` | 英語と日本語の文言 |
 
 React、TypeScript、Vite で作っています。
+
+## ライセンス
+
+[MIT](LICENSE) です。仕事の現場を含め、自由に使用、改造、再配布ができます。動作の保証はありません。

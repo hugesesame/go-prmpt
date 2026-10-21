@@ -73,3 +73,7 @@ Each one keeps its saved show apart from the other. Use **Save** and **Open** to
 | `src/i18n.tsx` | English and Japanese text |
 
 Built with React, TypeScript and Vite.
+
+## License
+
+[MIT](LICENSE). You are free to use, change and share GO PRMPT, including at work. It comes with no warranty.

@@ -12,6 +12,7 @@ import { formatClock, useNow } from '../useNow';
 import { ControlPanel } from './ControlPanel';
 import { CsvImportDialog } from './CsvImportDialog';
 import { CueList } from './CueList';
+import { HelpDialog } from './HelpDialog';
 import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
 import { Transport } from './Transport';
@@ -49,6 +50,7 @@ export function PrimaryApp() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [csvImport, setCsvImport] = useState<{ fileName: string; result: CsvImport } | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   const fullscreen = useIsFullscreen();
   const otherTabs = useOtherPrimaryTabs();
   const [mode, setMode] = useMode();
@@ -139,11 +141,13 @@ export function PrimaryApp() {
         ArrowDown: () => dispatch({ type: 'selectCueRelative', delta: 1 }),
         ArrowLeft: () => dispatch({ type: 'selectPageRelative', delta: -1 }),
         ArrowRight: () => dispatch({ type: 'selectPageRelative', delta: 1 }),
-        Escape: () => dispatch({ type: 'clear' }),
-        // 文字キーは入力モード（日本語入力中や Caps Lock）に左右されないようキーの位置で見る
+        // 文字キーは入力モード（日本語入力中や Caps Lock）に左右されないようキーの位置で見る。
+        // CLEAR は Esc にしない（取り消しやフルスクリーン解除のつもりで押して出力が消えないように）
+        KeyZ: () => dispatch({ type: 'clear' }),
         KeyX: () => dispatch({ type: 'toggleBlackout' }),
         KeyB: () => dispatch({ type: 'toggleBlink' }),
         KeyF: toggleFullscreen,
+        '?': () => setShowHelp(true),
       };
       const action = actions[e.key] ?? (e.shiftKey ? undefined : actions[e.code]);
       if (!action) return;
@@ -222,6 +226,12 @@ export function PrimaryApp() {
             onImportCsv={importCsv}
             dispatch={dispatch}
           />
+          <div className="help-footer">
+            <button title={t('helpHint')} onClick={() => setShowHelp(true)}>
+              <span className="help-mark">?</span>
+              {t('help')}
+            </button>
+          </div>
         </div>
         <VerticalSplit
           storageKey="prompter.overlayHeight"
@@ -255,6 +265,7 @@ export function PrimaryApp() {
         <ControlPanel state={state} outputState={outputState} timecode={timecode} locked={locked} dispatch={dispatch} />
       </main>
       <footer className="statusbar">{t('shortcuts')}</footer>
+      {showHelp && <HelpDialog onClose={() => setShowHelp(false)} />}
       {csvImport && (
         <CsvImportDialog
           fileName={csvImport.fileName}

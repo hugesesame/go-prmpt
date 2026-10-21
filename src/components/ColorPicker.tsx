@@ -75,7 +75,7 @@ function Popover({ anchor, value, onChange, onClose }: PopoverProps) {
       const target = e.target as Node;
       if (!ref.current?.contains(target) && !anchor.contains(target)) onClose();
     };
-    // Esc は出力のクリアに使われているので、開いている間はここで止める
+    // Esc で閉じる。メイン画面のショートカットには渡さない
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       e.stopPropagation();

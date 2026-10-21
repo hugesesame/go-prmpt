@@ -9,6 +9,8 @@ A cue-based prompter for live events. Line up your text in a cue list and send i
 
 **Open the app: https://hugesesame.github.io/go-prmpt/**
 
+> **This is a beta.** GO PRMPT is still being tested and has not been used in a real show yet. MTC and LTC have only been checked with software senders and an audio loopback, not with hardware. Try it with your own equipment before using it in a show.
+
 ![GO PRMPT](screenshots/main.png)
 
 ## Features

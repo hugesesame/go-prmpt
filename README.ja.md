@@ -9,6 +9,8 @@
 
 **アプリを開く：https://hugesesame.github.io/go-prmpt/**
 
+> **ベータ版です。** GO PRMPT はまだ検証中で、実際の本番では使っていません。MTC と LTC は、ソフトウェアの送り元とオーディオの折り返しでしか確認しておらず、ハードウェアの機材では試していません。本番で使う前に、実際の機材で試してください。
+
 ![GO PRMPT](screenshots/main.png)
 
 ## 主な機能

@@ -1,6 +1,7 @@
 import { useEffect, useReducer } from 'react';
 import { newCue, newOverlay, newPage, newShow, uid } from './defaults';
 import { parseShow } from './fileio';
+import { countdownRemaining } from './useNow';
 import type {
   AfterLast,
   Cue,
@@ -52,6 +53,10 @@ export type Action =
   | { type: 'moveOverlay'; from: number; to: number }
   /** 出ていなければ出す（カウントダウンは最初から開始）、出ていれば消す。同じ種類は入れ替わる */
   | { type: 'toggleOverlay'; id: string }
+  /** 出ているカウントダウンを一時停止・再開する */
+  | { type: 'pauseCountdown' }
+  /** 出ているカウントダウンを最初の時間に戻して一時停止する（表示は出したまま） */
+  | { type: 'resetCountdown' }
   | { type: 'go' }
   /** 時刻トリガー。開いていないページの Cue でも手動の GO と同じように実行する */
   | { type: 'fireCue'; pageId: string; cueId: string }
@@ -275,12 +280,28 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case 'moveOverlay':
       return { ...state, show: { ...state.show, overlays: move(state.show.overlays, action.from, action.to) } };
+    case 'pauseCountdown': {
+      const { countdown } = state;
+      if (!countdown) return state;
+      const now = Date.now();
+      if (countdown.pausedRemaining === null) {
+        return { ...state, countdown: { ...countdown, pausedRemaining: countdownRemaining(countdown, now) } };
+      }
+      // 止めたときの残りから続ける
+      const startedAt = now - (countdown.seconds - countdown.pausedRemaining) * 1000;
+      return { ...state, countdown: { ...countdown, startedAt, pausedRemaining: null } };
+    }
+    case 'resetCountdown':
+      return state.countdown ? { ...state, countdown: { ...state.countdown, pausedRemaining: state.countdown.seconds } } : state;
     case 'toggleOverlay': {
       const overlay = state.show.overlays.find((o) => o.id === action.id);
       if (!overlay) return state;
       if (overlay.kind === 'countdown') {
         if (state.countdown?.overlayId === overlay.id) return { ...state, countdown: null };
-        return { ...state, countdown: { overlayId: overlay.id, seconds: overlay.seconds, size: overlay.size, startedAt: Date.now() } };
+        return {
+          ...state,
+          countdown: { overlayId: overlay.id, seconds: overlay.seconds, size: overlay.size, startedAt: Date.now(), pausedRemaining: null },
+        };
       }
       if (state.message?.overlayId === overlay.id) return { ...state, message: null };
       return { ...state, message: { overlayId: overlay.id, text: overlay.text, blink: overlay.blink, size: overlay.size } };

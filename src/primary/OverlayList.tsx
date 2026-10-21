@@ -8,6 +8,8 @@ import { formatCountdown } from '../useNow';
 interface Props {
   overlays: Overlay[];
   liveCountdownId: string | null;
+  /** 出ているカウントダウンが一時停止中 */
+  countdownPaused: boolean;
   liveMessageId: string | null;
   /** ショーモード。出す・消すだけできる */
   locked: boolean;
@@ -15,7 +17,7 @@ interface Props {
 }
 
 /** カウントダウンとメッセージのリスト（ショー全体で 1 つ）。メインの GO とは別に出し入れする */
-export function OverlayList({ overlays, liveCountdownId, liveMessageId, locked, dispatch }: Props) {
+export function OverlayList({ overlays, liveCountdownId, countdownPaused, liveMessageId, locked, dispatch }: Props) {
   const { t } = useLang();
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
@@ -47,6 +49,7 @@ export function OverlayList({ overlays, liveCountdownId, liveMessageId, locked, 
                 live && 'live',
                 // 点滅中のメッセージは左端のバーも点滅させる
                 live && overlay.kind === 'message' && overlay.blink && 'blinking',
+                live && overlay.kind === 'countdown' && countdownPaused && 'paused',
                 dropAt === i && dragFrom !== i && 'drop-target',
               ]
                 .filter(Boolean)
@@ -119,7 +122,26 @@ export function OverlayList({ overlays, liveCountdownId, liveMessageId, locked, 
                   BLINK
                 </button>
               ) : (
-                <span />
+                // 一時停止・再開とリセット。出ているカウントダウンだけに効く。本番中の操作なのでショーモードでも使える
+                <div className="countdown-controls">
+                  <button
+                    className={live && countdownPaused ? 'active' : ''}
+                    disabled={!live}
+                    aria-label={t(live && countdownPaused ? 'countdownResume' : 'countdownPause')}
+                    title={t(live && countdownPaused ? 'countdownResume' : 'countdownPause')}
+                    onClick={() => dispatch({ type: 'pauseCountdown' })}
+                  >
+                    {live && countdownPaused ? '▶' : '⏸'}
+                  </button>
+                  <button
+                    disabled={!live}
+                    aria-label={t('countdownReset')}
+                    title={t('countdownReset')}
+                    onClick={() => dispatch({ type: 'resetCountdown' })}
+                  >
+                    ↺
+                  </button>
+                </div>
               )}
               <button
                 className={live ? 'overlay-toggle active' : 'overlay-toggle'}

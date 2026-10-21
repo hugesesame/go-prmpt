@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { LiveCountdown } from './types';
 
 export function useNow(intervalMs: number, enabled = true) {
   const [now, setNow] = useState(Date.now);
@@ -12,6 +13,11 @@ export function useNow(intervalMs: number, enabled = true) {
 
 export function formatClock(ms: number) {
   return new Date(ms).toLocaleTimeString('ja-JP', { hour12: false });
+}
+
+/** カウントダウンの残り秒。0 を過ぎるとマイナス */
+export function countdownRemaining(countdown: LiveCountdown, now: number) {
+  return countdown.pausedRemaining ?? countdown.seconds - (now - countdown.startedAt) / 1000;
 }
 
 /** 残り時間は切り上げて表示し、0 を過ぎたら経過時間に - を付けて表示する（例 4:59、-0:12、1:00:00） */

@@ -563,6 +563,10 @@ input[type='checkbox'] {
 .overlay-row.live {
   border-left-color: var(--live);
 }
+/* 一時停止中は左端のバーを黄色にする */
+.overlay-row.live.paused {
+  border-left-color: var(--warn);
+}
 .overlay-row.blinking {
   animation: bar-blink 1s step-end infinite;
 }
@@ -609,6 +613,21 @@ input[type='checkbox'] {
   font-size: 11px;
   font-weight: 700;
   padding: 5px 0;
+}
+/* カウントダウンの一時停止とリセット。BLINK と同じ幅に 2 つ並べる */
+.countdown-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.countdown-controls button {
+  padding: 4px 0;
+  font-size: 12px;
+}
+.countdown-controls button.active {
+  background: var(--warn);
+  border-color: var(--warn);
+  color: #1d1300;
 }
 /* メインの BLINK ボタンと同じ見た目 */
 .overlay-blink.active {

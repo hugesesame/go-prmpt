@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import type { LiveCountdown, LiveCue, OutputSettings, OutputState } from '../types';
-import { formatCountdown, useNow } from '../useNow';
+import { countdownRemaining, formatCountdown, useNow } from '../useNow';
 // 保留中: Sec / CD（docs/ideas.md 参照）
 // import { formatRemaining } from '../useNow';（useNow は上で import 済み）
 
@@ -70,10 +70,10 @@ export function OutputView({ state }: { state: OutputState }) {
   );
 }
 
-/** 画面上部のカウントダウン。0 を過ぎたら赤くして経過時間を数える */
+/** 画面上部のカウントダウン。0 を過ぎたら赤くして経過時間を数える。一時停止中は数字が止まるだけ */
 function CountdownOverlay({ countdown, color }: { countdown: LiveCountdown; color: string }) {
-  const now = useNow(100);
-  const remaining = countdown.seconds - (now - countdown.startedAt) / 1000;
+  const now = useNow(100, countdown.pausedRemaining === null);
+  const remaining = countdownRemaining(countdown, now);
   return (
     <div
       className={remaining < 0 ? 'overlay-countdown over' : 'overlay-countdown'}

@@ -86,12 +86,14 @@ export interface LiveCue {
   startedAt: number;
 }
 
-/** 動いているカウントダウン。残り時間は startedAt から計算するので、どの画面でも同じ値になる */
+/** 出ているカウントダウン。残り時間は startedAt から計算するので、どの画面でも同じ値になる */
 export interface LiveCountdown {
   overlayId: string;
   seconds: number;
   size: number;
   startedAt: number;
+  /** 一時停止中の残り秒（0 を過ぎていればマイナス）。動いていれば null */
+  pausedRemaining: number | null;
 }
 
 /** 出ているメッセージ */

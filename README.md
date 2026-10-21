@@ -34,14 +34,42 @@ To try it with sample data, download [`samples/sample-show.json`](samples/sample
 
 Your shows stay on your computer. Edits are saved in the browser automatically, and **Save** writes a show file wherever you choose. Nothing is sent to a server.
 
-## Development
+## Running it on your own computer
 
-Requires Node.js 20.19+ or 22.12+.
+This part is for people who want to change the app or build it themselves. You do not need it to use the app — just open the link above. It needs Node.js 20.19+ or 22.12+.
 
 ```bash
 npm install
-npm run dev     # http://localhost:5173
-npm run build   # outputs to dist/
+npm run dev
 ```
 
-Every push to `main` is built and published to GitHub Pages by GitHub Actions.
+Open the address that appears in the terminal (normally http://localhost:5173/).
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server; changes to the code show up right away |
+| `npm run build` | Type-check and build the app into `dist/` |
+| `npm run preview` | Open the built app from `dist/` locally |
+
+The public site and your local copy behave a little differently:
+
+| | Public site | Local dev server (localhost) |
+|---|---|---|
+| What you need | Chrome | Chrome and Node.js |
+| Internet | Needed to open the app | Not needed |
+| Saved show and settings | Kept for the site | Kept for localhost |
+| Microphone, MIDI and window permissions | Asked for the site | Asked again for localhost |
+
+Each one keeps its saved show apart from the other. Use **Save** and **Open** to move a show between them.
+
+| Path | Contents |
+|---|---|
+| `src/primary/` | The main screen: cue list, pages, overlays, timecode engine, help |
+| `src/output/` | The output window |
+| `src/components/` | Parts shared by both screens, such as the output view and color picker |
+| `src/state.ts` | App state and actions |
+| `src/timecode.ts`, `src/mtc.ts`, `src/ltc.ts` | Timecode math, MTC and LTC encoding and decoding |
+| `src/csv.ts`, `src/fileio.ts` | CSV import, saving and opening show files |
+| `src/i18n.tsx` | English and Japanese text |
+
+Built with React, TypeScript and Vite.

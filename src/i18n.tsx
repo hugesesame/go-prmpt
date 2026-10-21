@@ -16,7 +16,7 @@ const en = {
     'Prompter is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
   modeHint: 'PROGRAM: edit the show / SHOW: run the show with editing locked',
   shortcuts:
-    'Space: GO   ↑↓: Select cue   ←→: Switch page   Esc: Clear   X: Black out   B: Blink   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
+    'Space: GO   ↑↓: Select cue   ←→: Switch page   Esc: Clear   X: Black out   B: Blink   F: Fullscreen   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
 
   pages: 'Pages',
   addPage: '+ Page',
@@ -135,7 +135,7 @@ const en = {
   fullscreen: 'Fullscreen',
   exitFullscreen: 'Exit Fullscreen',
   waitingForPrimary: 'Waiting for the primary screen…',
-  doubleClickFullscreen: 'Double-click for fullscreen',
+  doubleClickFullscreen: 'F or double-click for fullscreen',
 };
 
 type Key = keyof typeof en;
@@ -152,7 +152,7 @@ const ja: Record<Key, string> = {
   invalidShowFile: 'Prompter のショーファイルではありません。',
   modeHint: 'PROGRAM：ショーを編集 / SHOW：本番用（編集をロック）',
   otherTabOpen: '他のタブでも Prompter が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
-  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Esc: クリア　X: ブラックアウト　B: ブリンク　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
+  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Esc: クリア　X: ブラックアウト　B: ブリンク　F: フルスクリーン　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
 
   pages: 'ページ',
   addPage: '＋ ページ',
@@ -271,7 +271,7 @@ const ja: Record<Key, string> = {
   fullscreen: 'フルスクリーン',
   exitFullscreen: 'フルスクリーン解除',
   waitingForPrimary: 'プライマリー画面を待っています…',
-  doubleClickFullscreen: 'ダブルクリックでフルスクリーン',
+  doubleClickFullscreen: 'F キーかダブルクリックでフルスクリーン',
 };
 
 const dictionaries: Record<Lang, Record<Key, string>> = { en, ja };

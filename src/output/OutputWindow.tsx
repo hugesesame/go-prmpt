@@ -21,6 +21,17 @@ export function OutputWindow() {
     return () => channel.close();
   }, []);
 
+  // F でフルスクリーン（メイン画面と同じく、入力モードに左右されないようキーの位置で見る）
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'KeyF' || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+      e.preventDefault();
+      toggleFullscreen();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   // 本番中にマウスカーソルやボタンが映り込まないよう、動かさなければ隠す
   useEffect(() => {
     let timer = setTimeout(() => setCursorIdle(true), 2000);

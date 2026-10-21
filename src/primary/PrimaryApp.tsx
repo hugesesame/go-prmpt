@@ -143,6 +143,7 @@ export function PrimaryApp() {
         // 文字キーは入力モード（日本語入力中や Caps Lock）に左右されないようキーの位置で見る
         KeyX: () => dispatch({ type: 'toggleBlackout' }),
         KeyB: () => dispatch({ type: 'toggleBlink' }),
+        KeyF: toggleFullscreen,
       };
       const action = actions[e.key] ?? (e.shiftKey ? undefined : actions[e.code]);
       if (!action) return;

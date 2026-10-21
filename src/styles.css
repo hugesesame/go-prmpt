@@ -186,11 +186,20 @@ input[type='checkbox'] {
 }
 
 .statusbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
   padding: 5px 14px;
   font-size: 11px;
   color: var(--muted);
   background: var(--panel);
   border-top: 1px solid var(--border);
+}
+
+/* 回線のない場所でも開き直せる状態になったら、ステータスバーの右端に出す */
+.offline-ready {
+  flex-shrink: 0;
+  color: var(--go);
 }
 
 .panel {

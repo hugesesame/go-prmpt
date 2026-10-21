@@ -141,6 +141,8 @@ const en = {
   waitingForPrimary: 'Waiting for the primary screen…',
   help: 'Help',
   helpHint: 'Open the user guide (? key)',
+  offlineReady: 'Offline ready',
+  offlineReadyHint: 'Saved in this browser. You can reopen or reload the app without an internet connection.',
   close: 'Close',
   doubleClickFullscreen: 'F or double-click for fullscreen',
 };
@@ -284,6 +286,8 @@ const ja: Record<Key, string> = {
   waitingForPrimary: 'プライマリー画面を待っています…',
   help: 'ヘルプ',
   helpHint: '使い方の説明を開く（? キー）',
+  offlineReady: 'オフライン対応',
+  offlineReadyHint: 'このブラウザに保存済みです。回線がなくても、開き直しや再読み込みができます。',
   close: '閉じる',
   doubleClickFullscreen: 'F キーかダブルクリックでフルスクリーン',
 };

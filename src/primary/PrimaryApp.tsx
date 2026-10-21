@@ -7,6 +7,7 @@ import { newShow, sideWidthRange } from '../defaults';
 import { InvalidShowError, isAbort, openCsvFile, openShowFromFile, resetFileHandle, saveShowToFile } from '../fileio';
 import { toggleFullscreen, useIsFullscreen } from '../fullscreen';
 import { useLang } from '../i18n';
+import { useOfflineReady } from '../offline';
 import { currentPage, useAppState } from '../state';
 import type { OutputState } from '../types';
 import { formatClock, useNow } from '../useNow';
@@ -52,6 +53,7 @@ export function PrimaryApp() {
   const [error, setError] = useState<string | null>(null);
   const [csvImport, setCsvImport] = useState<{ fileName: string; result: CsvImport } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const offlineReady = useOfflineReady();
   const [sideWidth, setSideWidth] = useColumnWidth('prompter.sideWidth', sideWidthRange);
   const fullscreen = useIsFullscreen();
   const otherTabs = useOtherPrimaryTabs();
@@ -274,7 +276,14 @@ export function PrimaryApp() {
         />
         <ControlPanel state={state} outputState={outputState} timecode={timecode} locked={locked} dispatch={dispatch} />
       </main>
-      <footer className="statusbar">{t('shortcuts')}</footer>
+      <footer className="statusbar">
+        <span>{t('shortcuts')}</span>
+        {offlineReady && (
+          <span className="offline-ready" title={t('offlineReadyHint')}>
+            ● {t('offlineReady')}
+          </span>
+        )}
+      </footer>
       {showHelp && <HelpDialog onClose={() => setShowHelp(false)} />}
       {csvImport && (
         <CsvImportDialog

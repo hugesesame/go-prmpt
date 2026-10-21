@@ -32,9 +32,20 @@ A cue-based prompter for live events. Line up your text in a cue list and send i
 
 To try it with sample data, download [`samples/sample-show.json`](samples/sample-show.json) and load it with **Open**.
 
-## Your data
+## Where your show is kept
 
-Your shows stay on your computer. Edits are saved in the browser automatically, and **Save** writes a show file wherever you choose. Nothing is sent to a server.
+- Your show is saved automatically in this computer's browser as you work.
+- Nothing is sent anywhere. The show is not on other computers, or in other browsers on the same computer.
+- Clearing the browser's site data deletes the show too.
+- **Save** (`⌘S`) writes the show to a file wherever you choose. Use it for backups, and to move a show to another computer with **Open**.
+- If the app is open in more than one tab, a yellow warning appears. The tabs overwrite each other's edits, so close all but one.
+
+## Without an internet connection
+
+- Once the app is open, it keeps working if the connection drops. Timecode, MIDI and the output window do not use the internet.
+- The app also keeps a copy of itself in the browser. When **Offline ready** appears at the bottom right, you can reopen or reload the app on that computer without a connection, including the output window.
+- Before taking a computer to a venue with no connection, open the app once where you have a connection and check that **Offline ready** appears.
+- When there is a connection, the app loads the latest version each time it opens.
 
 ## Running it on your own computer
 
@@ -58,7 +69,7 @@ The public site and your local copy behave a little differently:
 | | Public site | Local dev server (localhost) |
 |---|---|---|
 | What you need | Chrome | Chrome and Node.js |
-| Internet | Needed to open the app | Not needed |
+| Internet | Needed the first time | Not needed |
 | Saved show and settings | Kept for the site | Kept for localhost |
 | Microphone, MIDI and window permissions | Asked for the site | Asked again for localhost |
 

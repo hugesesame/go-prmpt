@@ -33,6 +33,11 @@ const ja: HelpSection[] = [
           <li>編集した内容はブラウザに自動で保存され、開き直すと続きから使えます。ファイルに残すときは「保存」してください。</li>
           <li>同じアプリを複数のタブで開くと黄色い警告が出ます。お互いの編集を上書きしてしまうので、1 つだけ残して閉じてください。</li>
         </ul>
+        <h4>回線がないとき</h4>
+        <ul>
+          <li>画面の右下に「オフライン対応」と出ていれば、そのパソコンでは回線がなくても、開き直しや再読み込みができます（公開版のみ）。</li>
+          <li>回線のない現場へ持っていくパソコンは、回線のある場所で一度開いて、この表示を確かめておいてください。</li>
+        </ul>
       </>
     ),
   },
@@ -302,6 +307,11 @@ const en: HelpSection[] = [
         <ul>
           <li>Your edits are saved in the browser automatically and are still there when you reopen the app. Use "Save" to keep a file.</li>
           <li>If the app is open in more than one tab, a yellow warning appears. The tabs overwrite each other's edits, so close all but one.</li>
+        </ul>
+        <h4>Without an internet connection</h4>
+        <ul>
+          <li>When "Offline ready" appears at the bottom right, you can reopen or reload the app on this computer without a connection (public site only).</li>
+          <li>Before taking a computer to a venue with no connection, open the app once where you have a connection and check for this.</li>
         </ul>
       </>
     ),

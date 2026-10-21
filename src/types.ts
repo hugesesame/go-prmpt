@@ -33,12 +33,12 @@ export interface Page {
 
 export type TriggerSource = 'clock' | 'tc';
 
-/** off: 使わない / mtc: 外部の MTC を受ける / internal: アプリの中で生成する */
-export type TimecodeSource = 'off' | 'mtc' | 'internal';
+/** off: 使わない / mtc: 外部の MTC を受ける / ltc: 音声の LTC を受ける / internal: アプリの中で生成する */
+export type TimecodeSource = 'off' | 'mtc' | 'ltc' | 'internal';
 
 export interface TimecodeSettings {
   source: TimecodeSource;
-  /** 内部生成の fps。受信のときは届いた MTC の fps を使う */
+  /** 内部生成の fps。受信のときは届いた MTC・LTC の fps を使う */
   frameRate: FrameRate;
   /** 内部生成の開始位置（⏮ で戻る位置） */
   start: string;

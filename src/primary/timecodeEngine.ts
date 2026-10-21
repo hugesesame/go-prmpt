@@ -2,7 +2,8 @@ import { useEffect, useState, useSyncExternalStore, type Dispatch } from 'react'
 import { defaultTimecode } from '../defaults';
 import { fullFrame, MtcDecoder, quarterFrame } from '../mtc';
 import type { Action } from '../state';
-import { formatTc, framesToTc, keySeconds, parseTc, realFps, tcKey, tcToFrames, type FrameRate } from '../timecode';
+import { LtcAudio, type AudioDevice, type LtcAudioState } from './ltcAudio';
+import { formatTc, framesToTc, keySeconds, parseTc, realFps, tcKey, tcToFrames, type FrameRate, type Timecode } from '../timecode';
 import type { Page, TimecodeSettings } from '../types';
 
 export interface MidiPort {
@@ -13,24 +14,36 @@ export interface MidiPort {
 /** unsupported: ブラウザが Web MIDI に対応していない / idle: まだ許可を求めていない / denied: 許可されなかった */
 export type MidiStatus = 'unsupported' | 'idle' | 'denied' | 'ready';
 
-export interface TimecodeSnapshot {
+export type { AudioDevice };
+
+export interface TimecodeSnapshot extends LtcAudioState {
   /** 今の位置（「01:02:15:12」）。まだ一度も届いていなければ null */
   tc: string | null;
   rate: FrameRate | null;
-  /** 進んでいる（MTC を受信中・内部で生成中） */
+  /** 進んでいる（MTC・LTC を受信中・内部で生成中） */
   running: boolean;
   midi: MidiStatus;
   inputs: MidiPort[];
   outputs: MidiPort[];
   inputId: string | null;
   outputId: string | null;
+  /** LTC を受けるオーディオ入力と、そのチャンネル（0 から） */
+  ltcInputId: string | null;
+  ltcChannel: number;
+  /** LTC を出すオーディオ出力（内部生成のとき） */
+  ltcOutputId: string | null;
 }
 
-// MIDI 機器はパソコンごとに違うのでショーファイルではなくブラウザに覚える
+// MIDI・オーディオ機器はパソコンごとに違うのでショーファイルではなくブラウザに覚える
 const INPUT_KEY = 'prompter.midiIn';
 const OUTPUT_KEY = 'prompter.midiOut';
-/** これ以上クォーターフレームが来なければ止まったとみなす */
+const LTC_INPUT_KEY = 'prompter.ltcIn';
+const LTC_CHANNEL_KEY = 'prompter.ltcInChannel';
+const LTC_OUTPUT_KEY = 'prompter.ltcOut';
+/** これ以上クォーターフレーム（LTC はフレーム）が来なければ止まったとみなす */
 const MTC_TIMEOUT_MS = 200;
+/** 生成中に LTC の位置合わせを送り直す間隔。音声と performance.now() の時計のずれを直す */
+const LTC_RESYNC_MS = 1000;
 /** 受信中にこれより先へ進んだら頭出しとみなし、間の Cue は実行しない */
 const JUMP_SECONDS = 1;
 /** 出力するクォーターフレームを先に予約しておく長さ。Worker の刻みより長くする */
@@ -57,7 +70,7 @@ function writeStored(key: string, value: string | null) {
 }
 
 /**
- * タイムコードの受信（MTC）・内部生成・MTC 出力と、TC ページの Cue の実行をまとめて受け持つ。
+ * タイムコードの受信（MTC・LTC）・内部生成・MTC / LTC 出力と、TC ページの Cue の実行をまとめて受け持つ。
  * 1 秒に何十回も変わる位置を React の状態に入れると画面全体が描き直されるので、
  * 位置は subscribe した部品（表示や設定）だけが受け取る
  */
@@ -77,6 +90,9 @@ export class TimecodeEngine {
   // 受信
   private decoder = new MtcDecoder();
   private lastQuarterAt = 0;
+  private ltc: LtcAudio | null = null;
+  private lastLtcAt = 0;
+  private lastLtcSync = 0;
 
   // 生成：再生中の位置は startFrame と再生を始めた時刻（startPerf）から計算する
   private playing = false;
@@ -96,6 +112,14 @@ export class TimecodeEngine {
       outputs: [],
       inputId: readStored(INPUT_KEY),
       outputId: readStored(OUTPUT_KEY),
+      audio: 'idle',
+      audioInputs: [],
+      audioOutputs: [],
+      ltcChannels: null,
+      ltcSignal: false,
+      ltcInputId: readStored(LTC_INPUT_KEY),
+      ltcChannel: Number(readStored(LTC_CHANNEL_KEY)) || 0,
+      ltcOutputId: readStored(LTC_OUTPUT_KEY),
     };
   }
 
@@ -115,6 +139,8 @@ export class TimecodeEngine {
     this.worker.postMessage(this.playing ? PLAYING_TICK_MS : IDLE_TICK_MS);
     this.bindInput();
     if (this.snapshot.midi === 'idle') void this.autoConnect();
+    this.ltc = new LtcAudio({ onState: (patch) => this.publish(patch), onFrame: this.onLtcFrame });
+    void this.ltc.autoConnect().then(() => this.bindAudio());
   }
 
   dispose() {
@@ -122,6 +148,8 @@ export class TimecodeEngine {
     this.worker?.terminate();
     this.worker = null;
     this.bindInput();
+    this.ltc?.dispose();
+    this.ltc = null;
   }
 
   setPages(pages: Page[]) {
@@ -139,6 +167,7 @@ export class TimecodeEngine {
       this.last = null;
       this.inclusive = false;
       this.bindInput();
+      this.bindAudio();
       if (settings.source === 'internal') {
         this.pausedFrame = this.startFrame = this.startPosition();
         this.locate(this.pausedFrame);
@@ -170,6 +199,30 @@ export class TimecodeEngine {
   setOutput(id: string | null) {
     writeStored(OUTPUT_KEY, id);
     this.publish({ outputId: id });
+  }
+
+  setLtcInput(id: string | null) {
+    writeStored(LTC_INPUT_KEY, id);
+    this.publish({ ltcInputId: id, tc: null, rate: null, running: false });
+    this.bindAudio();
+  }
+
+  setLtcChannel(channel: number) {
+    writeStored(LTC_CHANNEL_KEY, String(channel));
+    this.publish({ ltcChannel: channel });
+    this.bindAudio();
+  }
+
+  setLtcOutput(id: string | null) {
+    writeStored(LTC_OUTPUT_KEY, id);
+    this.publish({ ltcOutputId: id });
+    this.bindAudio();
+  }
+
+  /** ブラウザにオーディオ入力（マイク）の使用許可を求める。機器の名前を出すのにも必要 */
+  async connectAudio() {
+    await this.ltc?.connect();
+    this.bindAudio();
   }
 
   /** ブラウザに MIDI の使用許可を求める。MTC のフルフレームは SysEx なので SysEx も許可してもらう */
@@ -225,11 +278,15 @@ export class TimecodeEngine {
     if (this.settings.source === 'mtc' && this.snapshot.running && now - this.lastQuarterAt > MTC_TIMEOUT_MS) {
       this.publish({ running: false });
     }
+    if (this.settings.source === 'ltc' && this.snapshot.running && now - this.lastLtcAt > MTC_TIMEOUT_MS) {
+      this.publish({ running: false });
+    }
     if (this.settings.source === 'internal' && this.playing) {
       const frame = this.generatorFrame(now);
       this.publishGenerator(frame);
       this.advance(tcKey(framesToTc(frame, this.settings.frameRate)), false);
       this.scheduleOutput(now);
+      if (now - this.lastLtcSync > LTC_RESYNC_MS) this.syncLtcOutput();
     }
   }
 
@@ -310,6 +367,36 @@ export class TimecodeEngine {
     }
   }
 
+  // ---------- LTC ----------
+
+  /** 届いたフレームは送り終わった直後なので、今の位置はその次のフレーム。止まっていた後の最初のフレームは頭出しとして扱う */
+  private onLtcFrame = (tc: Timecode, rate: FrameRate) => {
+    if (this.settings.source !== 'ltc') return;
+    this.lastLtcAt = performance.now();
+    const now = framesToTc(tcToFrames(tc, rate) + 1, rate);
+    const key = tcKey(now);
+    const resumed = !this.snapshot.running;
+    this.publish({ tc: formatTc(now), rate, running: true });
+    if (resumed) this.locate(key, true);
+    else this.advance(key, true);
+  };
+
+  /** 設定に合わせて LTC の入力を開き、出力先を決める */
+  private bindAudio() {
+    const ltc = this.ltc;
+    if (!ltc || this.snapshot.audio !== 'ready') return;
+    const { ltcInputId, ltcChannel, ltcOutputId } = this.snapshot;
+    if (this.started && this.settings.source === 'ltc' && ltcInputId) void ltc.openInput(ltcInputId, ltcChannel);
+    else ltc.closeInput();
+    void ltc.setOutputDevice(this.settings.source === 'internal' ? ltcOutputId : null).then(() => this.syncLtcOutput());
+  }
+
+  /** 生成の今の位置合わせを LTC の出力に送る（止まっていれば無音） */
+  private syncLtcOutput() {
+    this.lastLtcSync = performance.now();
+    this.ltc?.setPlayback(this.playing ? { frame: this.startFrame, perf: this.startPerf, rate: this.settings.frameRate } : null);
+  }
+
   // ---------- 生成・出力 ----------
 
   private startPosition() {
@@ -324,6 +411,7 @@ export class TimecodeEngine {
   private setPlaying(playing: boolean) {
     this.playing = playing;
     this.worker?.postMessage(playing ? PLAYING_TICK_MS : IDLE_TICK_MS);
+    this.syncLtcOutput();
   }
 
   /** 生成の位置を動かす。再生中ならその位置から再生を続ける */
@@ -332,6 +420,7 @@ export class TimecodeEngine {
       this.startFrame = frame;
       this.startPerf = performance.now();
       this.nextQuarter = frame * 4;
+      this.syncLtcOutput();
     } else {
       this.pausedFrame = frame;
     }

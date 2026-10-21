@@ -4,9 +4,12 @@ import type { Action } from '../state';
 import { frameRates, type FrameRate } from '../timecode';
 import type { TimecodeSettings, TimecodeSource } from '../types';
 import { TcInput } from './TcInput';
-import { useTimecode, type MidiPort, type TimecodeEngine } from './timecodeEngine';
+import { useTimecode, type AudioDevice, type MidiPort, type TimecodeEngine } from './timecodeEngine';
 
 const rateLabel = (rate: FrameRate) => (rate === '29.97df' ? '29.97DF' : rate);
+
+const sourceLabels = { off: 'tcOff', mtc: 'tcMtcIn', ltc: 'tcLtcIn', internal: 'tcInternal' } as const;
+const headerLabels = { off: '', mtc: 'MTC', ltc: 'LTC', internal: 'TC' } as const;
 
 /**
  * ヘッダーの時計の横に出す今のタイムコード。進んでいる間は緑。
@@ -36,8 +39,8 @@ export function TimecodeDisplay({ engine, source }: { engine: TimecodeEngine; so
           </button>
         </div>
       )}
-      <div className={running ? 'tc-display running' : 'tc-display'} title={t(source === 'mtc' ? 'tcMtcIn' : 'tcInternal')}>
-        <span className="tc-label">{source === 'mtc' ? 'MTC' : 'TC'}</span>
+      <div className={running ? 'tc-display running' : 'tc-display'} title={t(sourceLabels[source])}>
+        <span className="tc-label">{headerLabels[source]}</span>
         <span className="tc-value">{tc ?? '--:--:--:--'}</span>
         <span className="tc-rate">{rate ? rateLabel(rate) : ''}</span>
       </div>
@@ -63,15 +66,15 @@ export function TimecodeSection({ engine, settings, locked, dispatch }: Props) {
     <section className="control-section">
       <h3>{t('timecode')}</h3>
       <fieldset className="tc-settings" disabled={locked}>
-        <div className="segmented three">
-          {(['off', 'mtc', 'internal'] as const).map((s) => (
+        <div className="segmented four">
+          {(['off', 'mtc', 'ltc', 'internal'] as const).map((s) => (
             <button key={s} className={source === s ? 'active' : ''} onClick={() => set({ source: s })}>
-              {t(s === 'off' ? 'tcOff' : s === 'mtc' ? 'tcMtcIn' : 'tcInternal')}
+              {t(sourceLabels[s])}
             </button>
           ))}
         </div>
 
-        {source !== 'off' && snapshot.midi !== 'ready' && (
+        {(source === 'mtc' || source === 'internal') && snapshot.midi !== 'ready' && (
           <div className="midi-notice">
             {snapshot.midi === 'unsupported' && t('midiUnsupported')}
             {snapshot.midi === 'denied' && t('midiDenied')}
@@ -92,6 +95,44 @@ export function TimecodeSection({ engine, settings, locked, dispatch }: Props) {
             disabled={snapshot.midi !== 'ready'}
             onChange={(id) => engine.setInput(id)}
           />
+        )}
+
+        {(source === 'ltc' || source === 'internal') && snapshot.audio !== 'ready' && (
+          <div className="midi-notice">
+            {snapshot.audio === 'denied' && t('audioDenied')}
+            {snapshot.audio === 'pending' && t('audioPending')}
+            {snapshot.audio === 'idle' && (
+              <button className="small" title={t('audioConnectHint')} onClick={() => engine.connectAudio()}>
+                {t('audioConnect')}
+              </button>
+            )}
+            {snapshot.audio === 'idle' && source === 'internal' && <span>{t('audioOptionalForInternal')}</span>}
+          </div>
+        )}
+
+        {source === 'ltc' && (
+          <>
+            <PortField
+              label={t('ltcInput')}
+              ports={snapshot.audioInputs}
+              value={snapshot.ltcInputId}
+              disabled={snapshot.audio !== 'ready'}
+              onChange={(id) => engine.setLtcInput(id)}
+            />
+            <ChannelField
+              channels={snapshot.ltcChannels}
+              value={snapshot.ltcChannel}
+              onChange={(channel) => engine.setLtcChannel(channel)}
+            />
+            {snapshot.ltcChannels !== null && (
+              <div className="field">
+                <span>{t('ltcSignal')}</span>
+                <span className={snapshot.running ? 'ltc-status ok' : snapshot.ltcSignal ? 'ltc-status warn' : 'ltc-status'}>
+                  {t(snapshot.running ? 'ltcReceiving' : snapshot.ltcSignal ? 'ltcNotReadable' : 'ltcNoSignal')}
+                </span>
+              </div>
+            )}
+          </>
         )}
 
         {source === 'internal' && (
@@ -124,6 +165,13 @@ export function TimecodeSection({ engine, settings, locked, dispatch }: Props) {
               disabled={snapshot.midi !== 'ready'}
               onChange={(id) => engine.setOutput(id)}
             />
+            <PortField
+              label={t('ltcOutput')}
+              ports={snapshot.audioOutputs}
+              value={snapshot.ltcOutputId}
+              disabled={snapshot.audio !== 'ready'}
+              onChange={(id) => engine.setLtcOutput(id)}
+            />
           </>
         )}
       </fieldset>
@@ -146,13 +194,13 @@ export function TimecodeSection({ engine, settings, locked, dispatch }: Props) {
 
 interface PortFieldProps {
   label: string;
-  ports: MidiPort[];
+  ports: (MidiPort | AudioDevice)[];
   value: string | null;
   disabled: boolean;
   onChange: (id: string | null) => void;
 }
 
-/** MIDI の入力・出力先。前に選んだ機器が今つながっていなければ「（未接続）」として残す */
+/** MIDI・オーディオの入力・出力先。前に選んだ機器が今つながっていなければ「（未接続）」として残す */
 function PortField({ label, ports, value, disabled, onChange }: PortFieldProps) {
   const { t } = useLang();
   const missing = value !== null && !ports.some((p) => p.id === value);
@@ -167,6 +215,32 @@ function PortField({ label, ports, value, disabled, onChange }: PortFieldProps) 
           </option>
         ))}
         {missing && <option value={value}>{t('tcDisconnected')}</option>}
+      </select>
+    </label>
+  );
+}
+
+interface ChannelFieldProps {
+  /** 入力のチャンネル数。入力を開いていなければ null */
+  channels: number | null;
+  value: number;
+  onChange: (channel: number) => void;
+}
+
+/** LTC を受けるチャンネル。入力を開くまで数が分からないので、選んであるチャンネルまでは出しておく */
+function ChannelField({ channels, value, onChange }: ChannelFieldProps) {
+  const { t } = useLang();
+  const count = Math.max(channels ?? 2, value + 1);
+  return (
+    <label className="field">
+      <span>{t('ltcChannel')}</span>
+      <select value={value} onChange={(e) => onChange(Number(e.target.value))}>
+        {Array.from({ length: count }, (_, i) => (
+          <option key={i} value={i}>
+            Ch {i + 1}
+            {channels !== null && i >= channels ? ` ${t('tcDisconnected')}` : ''}
+          </option>
+        ))}
       </select>
     </label>
   );

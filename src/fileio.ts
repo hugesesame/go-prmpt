@@ -89,7 +89,7 @@ function parseTimecodeSettings(value: unknown): TimecodeSettings {
   const v = value as Partial<TimecodeSettings> | undefined;
   const start = typeof v?.start === 'string' ? parseTc(v.start) : null;
   return {
-    source: v?.source === 'mtc' || v?.source === 'internal' ? v.source : 'off',
+    source: v?.source === 'mtc' || v?.source === 'ltc' || v?.source === 'internal' ? v.source : 'off',
     frameRate: frameRates.find((r) => r === v?.frameRate) ?? defaultTimecode.frameRate,
     start: start ? formatTc(start) : defaultTimecode.start,
   };

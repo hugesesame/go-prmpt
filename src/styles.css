@@ -1250,8 +1250,24 @@ input[type='checkbox'] {
 .tc-settings:disabled > * {
   opacity: 0.45;
 }
-.segmented.three {
-  grid-template-columns: repeat(3, 1fr);
+.segmented.four {
+  grid-template-columns: repeat(4, 1fr);
+}
+.segmented.four button {
+  padding-left: 2px;
+  padding-right: 2px;
+  font-size: 11px;
+}
+/* LTC 入力の状態。受信中は緑、音だけ来ているときは黄 */
+.ltc-status {
+  font-size: 12px;
+  color: var(--muted);
+}
+.ltc-status.ok {
+  color: var(--go);
+}
+.ltc-status.warn {
+  color: var(--warn);
 }
 .tc-start {
   font-family: var(--mono);

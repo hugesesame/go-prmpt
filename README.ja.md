@@ -9,9 +9,7 @@
 
 **アプリを開く：https://hugesesame.github.io/go-prmpt/**
 
-<!-- TODO: add screenshots/main.png, then uncomment
 ![GO PRMPT](screenshots/main.png)
--->
 
 ## 主な機能
 

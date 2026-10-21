@@ -9,9 +9,7 @@ A cue-based prompter for live events. Line up your text in a cue list and send i
 
 **Open the app: https://hugesesame.github.io/go-prmpt/**
 
-<!-- TODO: add screenshots/main.png, then uncomment
 ![GO PRMPT](screenshots/main.png)
--->
 
 ## Features
 

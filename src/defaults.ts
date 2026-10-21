@@ -51,7 +51,7 @@ export const overlaySizes = {
 export function newOverlay(kind: Overlay['kind']): Overlay {
   const size = overlaySizes[kind].default;
   return kind === 'countdown'
-    ? { id: uid(), kind, seconds: 5 * 60, size }
+    ? { id: uid(), kind, mode: 'length', seconds: 5 * 60, until: null, size }
     : { id: uid(), kind, text: '', blink: false, size };
 }
 

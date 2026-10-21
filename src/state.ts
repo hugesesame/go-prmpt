@@ -1,9 +1,11 @@
 import { useEffect, useReducer } from 'react';
 import { newCue, newOverlay, newPage, newShow, uid } from './defaults';
 import { parseShow } from './fileio';
+import { nearestTimeOfDay } from './timeOfDay';
 import { countdownRemaining } from './useNow';
 import type {
   AfterLast,
+  CountdownMode,
   Cue,
   LiveCountdown,
   LiveCue,
@@ -48,7 +50,11 @@ export type Action =
   | { type: 'selectCue'; id: string | null }
   | { type: 'selectCueRelative'; delta: number }
   | { type: 'addOverlay'; kind: Overlay['kind'] }
-  | { type: 'updateOverlay'; id: string; patch: { seconds?: number; text?: string; blink?: boolean; size?: number } }
+  | {
+      type: 'updateOverlay';
+      id: string;
+      patch: { mode?: CountdownMode; seconds?: number; until?: number | null; text?: string; blink?: boolean; size?: number };
+    }
   | { type: 'deleteOverlay'; id: string }
   | { type: 'moveOverlay'; from: number; to: number }
   /** 出ていなければ出す（カウントダウンは最初から開始）、出ていれば消す。同じ種類は入れ替わる */
@@ -251,7 +257,13 @@ function reducer(state: AppState, action: Action): AppState {
         o.id !== action.id
           ? o
           : o.kind === 'countdown'
-            ? { ...o, seconds: action.patch.seconds ?? o.seconds, size: action.patch.size ?? o.size }
+            ? {
+                ...o,
+                mode: action.patch.mode ?? o.mode,
+                seconds: action.patch.seconds ?? o.seconds,
+                until: action.patch.until !== undefined ? action.patch.until : o.until,
+                size: action.patch.size ?? o.size,
+              }
             : {
                 ...o,
                 text: action.patch.text ?? o.text,
@@ -260,7 +272,7 @@ function reducer(state: AppState, action: Action): AppState {
               },
       );
       const next = { ...state, show: { ...state.show, overlays } };
-      // 出ているものは書き直した文言・点滅・大きさにすぐ差し替える（長さは次に開始したときから）
+      // 出ているものは書き直した文言・点滅・大きさにすぐ差し替える（長さ・時刻は次に開始したときから）
       const { text, blink, size } = action.patch;
       if (next.message?.overlayId === action.id) {
         const m = next.message;
@@ -280,9 +292,10 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case 'moveOverlay':
       return { ...state, show: { ...state.show, overlays: move(state.show.overlays, action.from, action.to) } };
+    // 時刻まで数えるカウントダウンは、時計を止められないので一時停止・リセットしない
     case 'pauseCountdown': {
       const { countdown } = state;
-      if (!countdown) return state;
+      if (!countdown || countdown.endsAt !== null) return state;
       const now = Date.now();
       if (countdown.pausedRemaining === null) {
         return { ...state, countdown: { ...countdown, pausedRemaining: countdownRemaining(countdown, now) } };
@@ -292,15 +305,27 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, countdown: { ...countdown, startedAt, pausedRemaining: null } };
     }
     case 'resetCountdown':
-      return state.countdown ? { ...state, countdown: { ...state.countdown, pausedRemaining: state.countdown.seconds } } : state;
+      if (!state.countdown || state.countdown.endsAt !== null) return state;
+      return { ...state, countdown: { ...state.countdown, pausedRemaining: state.countdown.seconds } };
     case 'toggleOverlay': {
       const overlay = state.show.overlays.find((o) => o.id === action.id);
       if (!overlay) return state;
       if (overlay.kind === 'countdown') {
         if (state.countdown?.overlayId === overlay.id) return { ...state, countdown: null };
+        const now = Date.now();
+        const endsAt = overlay.mode === 'until' && overlay.until !== null ? nearestTimeOfDay(overlay.until, now) : null;
+        // 時刻が決まっていない「時刻まで」は出さない
+        if (overlay.mode === 'until' && endsAt === null) return state;
         return {
           ...state,
-          countdown: { overlayId: overlay.id, seconds: overlay.seconds, size: overlay.size, startedAt: Date.now(), pausedRemaining: null },
+          countdown: {
+            overlayId: overlay.id,
+            seconds: overlay.seconds,
+            size: overlay.size,
+            startedAt: now,
+            pausedRemaining: null,
+            endsAt,
+          },
         };
       }
       if (state.message?.overlayId === overlay.id) return { ...state, message: null };

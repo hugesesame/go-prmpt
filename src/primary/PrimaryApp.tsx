@@ -265,6 +265,7 @@ export function PrimaryApp() {
               overlays={state.show.overlays}
               liveCountdownId={state.countdown?.overlayId ?? null}
               countdownPaused={state.countdown?.pausedRemaining != null}
+              countdownTimed={state.countdown?.endsAt != null}
               liveMessageId={state.message?.overlayId ?? null}
               locked={locked}
               dispatch={dispatch}

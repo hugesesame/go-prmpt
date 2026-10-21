@@ -614,6 +614,24 @@ input[type='checkbox'] {
   width: 90px;
   font-family: var(--mono);
 }
+/* カウントダウンの LEN / TIME の切り替えと、長さ・時刻の入力欄 */
+.countdown-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.countdown-mode {
+  flex-shrink: 0;
+  font-size: 9px;
+}
+.countdown-mode span {
+  padding: 2px 7px;
+}
+.countdown-mode:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 /* 右列のスライダーと同じ色 */
 .overlay-size {
   width: 100%;

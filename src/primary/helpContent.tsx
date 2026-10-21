@@ -99,8 +99,10 @@ const ja: HelpSection[] = [
         <p>Cue とは別に、出力の上に重ねて出せます。リストはショー全体で 1 つです。GO とは関係なく出し入れできます。</p>
         <h4>カウントダウン（画面の上）</h4>
         <ul>
-          <li>長さを「5:00」のように入れ、「▶ START」で出して数え始めます。「■ STOP」で消えます。</li>
-          <li>⏸ で一時停止、もう一度押すと再開します。↺ で最初の時間に戻して一時停止します（▶ で数え始めます）。</li>
+          <li>行の <b>LEN / TIME</b> で数え方を選びます。<b>LEN</b> は長さ（「5:00」など）、<b>TIME</b> は終わる時刻（「19:00」など、24 時間表記）まで数えます。</li>
+          <li>「▶ START」で出して数え始めます。「■ STOP」で消えます。</li>
+          <li>LEN のときは、⏸ で一時停止、もう一度押すと再開します。↺ で最初の時間に戻して一時停止します（▶ で数え始めます）。TIME のときは時計を止められないので、⏸ と ↺ は使えません。</li>
+          <li>TIME で、START したときにもう過ぎている時刻なら、過ぎた分を赤で数えます。日付をまたぐ時刻（23:50 に「0:10」など）は翌日として数えます。</li>
           <li>0 を過ぎると赤くなり、「-0:12」のように経過時間を数えます。</li>
         </ul>
         <h4>メッセージ（画面の下）</h4>
@@ -365,8 +367,10 @@ const en: HelpSection[] = [
         <p>These sit on top of the output, separate from cues. There is one list for the whole show, and you show or hide them independently of GO.</p>
         <h4>Countdown (top of the screen)</h4>
         <ul>
-          <li>Enter a length such as "5:00" and press "▶ START" to show it and start counting. "■ STOP" hides it.</li>
-          <li>⏸ pauses; press again to resume. ↺ goes back to the full time and pauses (press ▶ to start).</li>
+          <li>Choose how it counts with <b>LEN / TIME</b> on the row: <b>LEN</b> counts down a length (such as "5:00"), <b>TIME</b> counts down to a time of day (such as "19:00", 24-hour).</li>
+          <li>Press "▶ START" to show it and start counting. "■ STOP" hides it.</li>
+          <li>With LEN, ⏸ pauses; press again to resume. ↺ goes back to the full time and pauses (press ▶ to start). With TIME the clock cannot be stopped, so ⏸ and ↺ are not available.</li>
+          <li>With TIME, if the time has already passed when you press START, it counts the time over in red. A time across midnight (such as "0:10" at 23:50) counts to the next day.</li>
           <li>After 0 it turns red and counts the time over, such as "-0:12".</li>
         </ul>
         <h4>Message (bottom of the screen)</h4>

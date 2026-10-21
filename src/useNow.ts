@@ -17,6 +17,7 @@ export function formatClock(ms: number) {
 
 /** カウントダウンの残り秒。0 を過ぎるとマイナス */
 export function countdownRemaining(countdown: LiveCountdown, now: number) {
+  if (countdown.endsAt !== null) return (countdown.endsAt - now) / 1000;
   return countdown.pausedRemaining ?? countdown.seconds - (now - countdown.startedAt) / 1000;
 }
 

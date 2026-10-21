@@ -109,11 +109,23 @@ function parseCue(value: Partial<Cue>): Cue {
 }
 
 function parseOverlay(value: unknown): Overlay[] {
-  const o = value as Partial<{ id: unknown; kind: unknown; seconds: unknown; text: unknown; blink: unknown; size: unknown }> | null;
+  const o = value as Partial<{
+    id: unknown;
+    kind: unknown;
+    mode: unknown;
+    seconds: unknown;
+    until: unknown;
+    text: unknown;
+    blink: unknown;
+    size: unknown;
+  }> | null;
   const id = typeof o?.id === 'string' ? o.id : uid();
   if (o?.kind === 'countdown') {
     const seconds = typeof o.seconds === 'number' && o.seconds >= 0 ? o.seconds : 0;
-    return [{ id, kind: 'countdown', seconds, size: parseSize(o.size, 'countdown') }];
+    // 時刻まで数える設定が無かった頃のファイルは、長さを数えるカウントダウンとして読む
+    const until = Number.isInteger(o.until) && (o.until as number) >= 0 && (o.until as number) < 24 * 60 * 60 ? (o.until as number) : null;
+    const mode = o.mode === 'until' ? 'until' : 'length';
+    return [{ id, kind: 'countdown', mode, seconds, until, size: parseSize(o.size, 'countdown') }];
   }
   if (o?.kind === 'message') {
     const text = typeof o.text === 'string' ? o.text : '';

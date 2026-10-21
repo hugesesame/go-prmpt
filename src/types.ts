@@ -57,12 +57,25 @@ export interface OutputSettings {
   transitionMs: number;
 }
 
+export type CountdownMode = 'length' | 'until';
+
 /**
  * メインの Cue とは別に重ねて出すもの。ショー全体で 1 つのリスト。
  * カウントダウンは画面の上、メッセージは画面の下に出る
  */
 export type Overlay =
-  | { id: string; kind: 'countdown'; /** 長さ（秒） */ seconds: number; /** 出力画面の高さに対する % */ size: number }
+  | {
+      id: string;
+      kind: 'countdown';
+      /** length: 長さを数える / until: 決めた時刻まで数える */
+      mode: CountdownMode;
+      /** 長さ（秒） */
+      seconds: number;
+      /** 終わる時刻（0 時からの秒）。未設定は null */
+      until: number | null;
+      /** 出力画面の高さに対する % */
+      size: number;
+    }
   | { id: string; kind: 'message'; text: string; /** 点滅させる */ blink: boolean; /** 出力画面の高さに対する % */ size: number };
 
 export interface Show {
@@ -94,6 +107,8 @@ export interface LiveCountdown {
   startedAt: number;
   /** 一時停止中の残り秒（0 を過ぎていればマイナス）。動いていれば null */
   pausedRemaining: number | null;
+  /** 時刻まで数えるときの終わる時刻（エポックミリ秒）。長さを数えるときは null */
+  endsAt: number | null;
 }
 
 /** 出ているメッセージ */

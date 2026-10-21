@@ -313,19 +313,22 @@ function TimeInput({ seconds, off, readOnly, title, onCommit }: TimeInputProps) 
 
 interface EditorProps {
   initial: string;
+  /** 省略時は Cue リストの行の見た目 */
+  className?: string;
   placeholder: string;
   hint: string;
   /** 確定したテキスト。取り消しは null */
   onDone: (text: string | null) => void;
 }
 
-function CueTextEditor({ initial, placeholder, hint, onDone }: EditorProps) {
+/** Cue の文字の編集欄。Cue リストの行と NEXT の画面で使う */
+export function CueTextEditor({ initial, className = 'cue-text', placeholder, hint, onDone }: EditorProps) {
   const [value, setValue] = useState(initial);
   const cancelled = useRef(false);
 
   return (
     <textarea
-      className="cue-text"
+      className={className}
       rows={1}
       autoFocus
       value={value}

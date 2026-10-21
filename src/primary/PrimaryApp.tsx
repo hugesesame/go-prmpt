@@ -37,9 +37,9 @@ function useMode() {
   return [mode, setMode] as const;
 }
 
-/** ダブルクリックが独自の意味を持つ要素（文字選択・Cue 実行・ボタン連打）ではフルスクリーンにしない */
+/** ダブルクリックが独自の意味を持つ要素（文字選択・Cue 実行・ボタン連打・NEXT の編集）ではフルスクリーンにしない */
 function onBackgroundDoubleClick(e: MouseEvent) {
-  if ((e.target as HTMLElement).closest('input, textarea, select, button, dialog, .cue-row, .page-item')) return;
+  if ((e.target as HTMLElement).closest('input, textarea, select, button, dialog, .cue-row, .page-item, .preview.next')) return;
   toggleFullscreen();
 }
 

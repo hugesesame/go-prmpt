@@ -5,6 +5,7 @@ import { cueSizeRange } from '../defaults';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
 import type { Cue, OutputSettings, OutputState } from '../types';
+import { CueTextEditor } from './CueList';
 import { TimecodeSection } from './TimecodeSection';
 import type { TimecodeEngine } from './timecodeEngine';
 
@@ -24,6 +25,11 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
   const nextCue = currentPage(state).cues.find((c) => c.id === state.selectedCueId);
   const [showNext, setShowNext] = useShowNext();
   const nextState = useNextState(nextCue, settings);
+  /** NEXT の画面で文字を編集している Cue。編集中に選択が動いても、編集を始めた Cue に書き込む */
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editingCue = currentPage(state).cues.find((c) => c.id === editingId);
+
+  useEffect(() => setEditingId(null), [state.currentPageId, locked]);
 
   return (
     <aside className="panel controls">
@@ -54,9 +60,31 @@ export function ControlPanel({ state, outputState, timecode, locked, dispatch }:
           </span>
         </button>
         {showNext && (
-          <div className="preview next">
+          <div
+            className="preview next"
+            title={locked || !nextCue ? undefined : t('nextEditHint')}
+            onDoubleClick={() => !locked && nextCue && setEditingId(nextCue.id)}
+          >
             <OutputView state={nextState} />
             {!nextCue && <div className="preview-empty">{t('noNextCue')}</div>}
+            {/* 画面の上に重ねて編集する。確定するまで出力と Cue リストは変わらない */}
+            {editingCue && (
+              <div className="next-editor">
+                <CueTextEditor
+                  key={editingCue.id}
+                  initial={editingCue.text}
+                  className="next-editor-text"
+                  placeholder={t('emptyText')}
+                  hint={t('textHint')}
+                  onDone={(text) => {
+                    if (text !== null && text !== editingCue.text) {
+                      dispatch({ type: 'updateCue', id: editingCue.id, patch: { text } });
+                    }
+                    setEditingId(null);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 

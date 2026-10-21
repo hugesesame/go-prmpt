@@ -1,5 +1,4 @@
 import type { Dispatch } from 'react';
-import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
 
 interface Props {
@@ -7,9 +6,8 @@ interface Props {
   dispatch: Dispatch<Action>;
 }
 
-/** 本番の操作ボタン。ページリストの上に置く。幅が狭いので NEXT の長い文言は省略する */
+/** 本番の操作ボタン。ページリストの上に置く。次の Cue は右列の NEXT に出すのでここには出さない */
 export function Transport({ state, dispatch }: Props) {
-  const { t } = useLang();
   const nextCue = currentPage(state).cues.find((c) => c.id === state.selectedCueId);
 
   return (
@@ -23,10 +21,6 @@ export function Transport({ state, dispatch }: Props) {
       >
         GO <small>Space</small>
       </button>
-      <div className="next-cue">
-        <span className="label">{t('next')}</span>
-        <span className="next-text">{nextCue ? nextCue.text || t('emptyText') : '—'}</span>
-      </div>
       <div className="transport">
         <button onClick={() => dispatch({ type: 'clear' })}>
           CLEAR <small>Esc</small>

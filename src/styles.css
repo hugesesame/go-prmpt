@@ -735,6 +735,30 @@ input[type='checkbox'] {
 .next-bar:not(.open) .next-bar-chevron span {
   transform: rotate(-90deg);
 }
+/* NEXT の画面の上に重ねる編集欄。後ろの画面がうっすら見えるようにする */
+.next-editor {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: rgba(8, 10, 14, 0.82);
+}
+.next-editor-text {
+  resize: none;
+  field-sizing: content;
+  min-width: 60%;
+  max-width: 100%;
+  max-height: 100%;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: pre;
+  overflow: auto;
+}
+.next-editor-text:focus {
+  border-color: var(--go);
+}
 .preview-empty {
   position: absolute;
   inset: 0;
@@ -742,28 +766,6 @@ input[type='checkbox'] {
   place-items: center;
   font-size: 12px;
   color: var(--muted);
-}
-
-.next-cue {
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-  min-width: 0;
-}
-.next-cue .label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-}
-/* 2 行まで出して、それ以上は「…」で省略。1 行のときも 2 行ぶんの高さを取り、下のボタンが上下に動かないようにする */
-.next-text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  min-height: 2.8em;
 }
 
 /* 暗い現場でまぶしくないよう、普段は枠と文字だけ。NEXT の枠と同じ緑 */

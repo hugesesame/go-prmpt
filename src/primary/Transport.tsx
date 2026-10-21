@@ -23,13 +23,13 @@ export function Transport({ state, dispatch }: Props) {
       </button>
       <div className="transport">
         <button onClick={() => dispatch({ type: 'clear' })}>
-          CLEAR <small>Z</small>
+          CLEAR <small>C</small>
         </button>
         <button
           className={state.blackout ? 'toggle-button blackout active' : 'toggle-button blackout'}
           onClick={() => dispatch({ type: 'toggleBlackout' })}
         >
-          BLACK OUT <small>X</small>
+          BLACK OUT <small>Z</small>
         </button>
         <button
           className={state.blink ? 'toggle-button blink active' : 'toggle-button blink'}

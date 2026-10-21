@@ -16,7 +16,7 @@ const en = {
     'GO PRMPT is also open in another tab. Edits in each tab overwrite the other — close all but one tab.',
   modeHint: 'PROGRAM: edit the show / SHOW: run the show with editing locked',
   shortcuts:
-    'Space: GO   ↑↓: Select cue   ←→: Switch page   Z: Clear   X: Black out   B: Blink   F: Fullscreen   ?: Help   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
+    'Space: GO   ↑↓: Select cue   ←→: Switch page   C: Clear   Z: Black out   B: Blink   F: Fullscreen   ?: Help   Double-click cue: Edit   ⌘S: Save   ⌘O: Open   Double-click background: Fullscreen',
 
   pages: 'Pages',
   addPage: '+ Page',
@@ -155,7 +155,7 @@ const ja: Record<Key, string> = {
   invalidShowFile: 'GO PRMPT のショーファイルではありません。',
   modeHint: 'PROGRAM：ショーを編集 / SHOW：本番用（編集をロック）',
   otherTabOpen: '他のタブでも GO PRMPT が開いています。お互いの編集が上書きされるので、1 つだけ残して閉じてください。',
-  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　Z: クリア　X: ブラックアウト　B: ブリンク　F: フルスクリーン　?: ヘルプ　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
+  shortcuts: 'Space: GO　↑↓: Cue 選択　←→: ページ切替　C: クリア　Z: ブラックアウト　B: ブリンク　F: フルスクリーン　?: ヘルプ　Cue をダブルクリック: 編集　⌘S: 保存　⌘O: 開く　余白をダブルクリック: フルスクリーン',
 
   pages: 'ページ',
   addPage: '＋ ページ',

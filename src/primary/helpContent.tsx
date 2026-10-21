@@ -44,8 +44,8 @@ const ja: HelpSection[] = [
         <ul>
           <li><b>GO（<kbd>Space</kbd>）</b>：選択中の Cue を出力に出し、選択を次の Cue に進めます。実行中の Cue は緑、選択中の Cue は青で表示されます。</li>
           <li><b>Cue の選択</b>：クリックか <kbd>↑</kbd> <kbd>↓</kbd>。</li>
-          <li><b>CLEAR（<kbd>Z</kbd>）</b>：出力の文言を消します。</li>
-          <li><b>BLACK OUT（<kbd>X</kbd>）</b>：出力を真っ暗にします（カウントダウン・メッセージも隠れます）。もう一度押すと戻ります。</li>
+          <li><b>CLEAR（<kbd>C</kbd>）</b>：出力の文言を消します。</li>
+          <li><b>BLACK OUT（<kbd>Z</kbd>）</b>：出力を真っ暗にします（カウントダウン・メッセージも隠れます）。もう一度押すと戻ります。</li>
           <li><b>BLINK（<kbd>B</kbd>）</b>：出力の文言を点滅させます。もう一度押すと止まります。</li>
         </ul>
         <h4>NEXT プレビュー</h4>
@@ -254,8 +254,8 @@ const ja: HelpSection[] = [
               ['Space', 'GO'],
               ['↑ / ↓', 'Cue の選択'],
               ['← / →', 'ページの切り替え'],
-              ['Z', 'CLEAR'],
-              ['X', 'BLACK OUT'],
+              ['C', 'CLEAR'],
+              ['Z', 'BLACK OUT'],
               ['B', 'BLINK'],
               ['F', 'フルスクリーン（出力ウィンドウでも使えます）'],
               ['?', 'このヘルプ'],
@@ -312,8 +312,8 @@ const en: HelpSection[] = [
         <ul>
           <li><b>GO (<kbd>Space</kbd>)</b>: shows the selected cue on the output and selects the next cue. The live cue is green; the selected cue is blue.</li>
           <li><b>Select a cue</b>: click it, or use <kbd>↑</kbd> <kbd>↓</kbd>.</li>
-          <li><b>CLEAR (<kbd>Z</kbd>)</b>: clears the text from the output.</li>
-          <li><b>BLACK OUT (<kbd>X</kbd>)</b>: turns the output black (the countdown and message are hidden too). Press again to return.</li>
+          <li><b>CLEAR (<kbd>C</kbd>)</b>: clears the text from the output.</li>
+          <li><b>BLACK OUT (<kbd>Z</kbd>)</b>: turns the output black (the countdown and message are hidden too). Press again to return.</li>
           <li><b>BLINK (<kbd>B</kbd>)</b>: makes the output text blink. Press again to stop.</li>
         </ul>
         <h4>NEXT preview</h4>
@@ -520,8 +520,8 @@ Welcome,,Opening,M`}</pre>
               ['Space', 'GO'],
               ['↑ / ↓', 'Select cue'],
               ['← / →', 'Switch page'],
-              ['Z', 'CLEAR'],
-              ['X', 'BLACK OUT'],
+              ['C', 'CLEAR'],
+              ['Z', 'BLACK OUT'],
               ['B', 'BLINK'],
               ['F', 'Fullscreen (works in the output window too)'],
               ['?', 'This help'],

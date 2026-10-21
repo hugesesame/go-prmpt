@@ -143,8 +143,10 @@ export function PrimaryApp() {
         ArrowRight: () => dispatch({ type: 'selectPageRelative', delta: 1 }),
         // 文字キーは入力モード（日本語入力中や Caps Lock）に左右されないようキーの位置で見る。
         // CLEAR は Esc にしない（取り消しやフルスクリーン解除のつもりで押して出力が消えないように）
-        KeyZ: () => dispatch({ type: 'clear' }),
-        KeyX: () => dispatch({ type: 'toggleBlackout' }),
+        // 下の段で使うキーの間を 1 つずつ空け（X と V には何も割り当てない）、隣を押しても何も起きないようにする。
+        // BLACK OUT は緊急用なので、手探りで見つけやすい角の Z
+        KeyZ: () => dispatch({ type: 'toggleBlackout' }),
+        KeyC: () => dispatch({ type: 'clear' }),
         KeyB: () => dispatch({ type: 'toggleBlink' }),
         KeyF: toggleFullscreen,
         '?': () => setShowHelp(true),

@@ -641,10 +641,8 @@ input[type='checkbox'] {
   opacity: 0.6;
   cursor: default;
 }
-/* 右列のスライダーと同じ色 */
 .overlay-size {
   width: 100%;
-  accent-color: var(--accent);
 }
 .overlay-text,
 .overlay-duration {
@@ -987,15 +985,15 @@ input[type='checkbox'] {
 .color-brightness input {
   -webkit-appearance: none;
   appearance: none;
-  height: 10px;
+  height: 6px;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 3px;
 }
 .color-brightness input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   border: 2px solid #fff;
   border-radius: 50%;
   background: transparent;
@@ -1025,9 +1023,51 @@ input[type='checkbox'] {
   border-color: var(--border);
   background: var(--bg);
 }
-.field input[type='range'] {
-  accent-color: var(--accent);
+/* 右列とオーバーレイのスライダー。溝を細く描き、値までの塗りは --fill（rangeFill）で出す */
+.field input[type='range'],
+.overlay-size {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
   padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.field input[type='range']:disabled,
+.overlay-size:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.field input[type='range']::-webkit-slider-runnable-track,
+.overlay-size::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 0%), var(--muted) var(--fill, 0%));
+}
+.field input[type='range']::-webkit-slider-thumb,
+.overlay-size::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.field input[type='range']::-moz-range-track,
+.overlay-size::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 0%), var(--muted) var(--fill, 0%));
+}
+.field input[type='range']::-moz-range-thumb,
+.overlay-size::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .segmented {

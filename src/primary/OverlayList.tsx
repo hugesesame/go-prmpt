@@ -1,4 +1,5 @@
 import { useState, type Dispatch } from 'react';
+import { rangeFill } from '../components/rangeFill';
 import { overlaySizes } from '../defaults';
 import { useLang } from '../i18n';
 import type { Action } from '../state';
@@ -141,6 +142,7 @@ export function OverlayList({ overlays, liveCountdownId, countdownPaused, countd
                 step={0.5}
                 value={overlay.size}
                 disabled={locked}
+                style={rangeFill(overlay.size, overlaySizes[overlay.kind].min, overlaySizes[overlay.kind].max)}
                 title={`${t('overlaySize')}: ${overlay.size}`}
                 aria-label={t('overlaySize')}
                 onChange={(e) => dispatch({ type: 'updateOverlay', id: overlay.id, patch: { size: Number(e.target.value) } })}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { ColorPicker } from '../components/ColorPicker';
 import { OutputView } from '../components/OutputView';
+import { rangeFill } from '../components/rangeFill';
 import { cueSizeRange } from '../defaults';
 import { useLang } from '../i18n';
 import { currentPage, type Action, type AppState } from '../state';
@@ -245,6 +246,7 @@ function Slider({ label, title, min, max, step, value, unit, onChange }: SliderP
         step={step}
         value={value ?? min}
         disabled={value === undefined}
+        style={rangeFill(value ?? min, min, max)}
         onChange={(e) => onChange(Number(e.target.value))}
       />
       <code>

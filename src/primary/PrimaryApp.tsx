@@ -15,6 +15,7 @@ import { ControlPanel } from './ControlPanel';
 import { CsvImportDialog } from './CsvImportDialog';
 import { CueList } from './CueList';
 import { HelpDialog } from './HelpDialog';
+import { MobileNotice } from './MobileNotice';
 import { OverlayList } from './OverlayList';
 import { PageList } from './PageList';
 import { Transport } from './Transport';
@@ -285,6 +286,7 @@ export function PrimaryApp() {
         )}
       </footer>
       {showHelp && <HelpDialog onClose={() => setShowHelp(false)} />}
+      <MobileNotice />
       {csvImport && (
         <CsvImportDialog
           fileName={csvImport.fileName}

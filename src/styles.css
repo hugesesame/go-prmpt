@@ -1293,6 +1293,14 @@ input[type='checkbox'] {
   gap: 8px;
   margin-top: 16px;
 }
+.mobile-notice {
+  position: fixed;
+  margin: 0;
+  box-sizing: border-box;
+}
+.mobile-notice p {
+  line-height: 1.6;
+}
 
 /* ---------- Timecode ---------- */
 
